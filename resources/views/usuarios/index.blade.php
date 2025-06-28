@@ -23,7 +23,7 @@
         <br />
         <br />
         {{-- Botón debajo alineado a la derecha --}}
-        <div class="flex justify-end mb-4">
+        <div class="flex justify-end mb-4 mt-14">
             <a href="{{ route('usuarios.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 ➕ Nuevo Usuario
             </a>
@@ -80,7 +80,7 @@
 
         @push('scripts')
             <script>
-                $('#tablaUsuarios').DataTable({
+                $('#tablaUsuarios').DataTable({    //esto genera un buscador
                     dom: '<"flex justify-between items-center mb-4"l f> <"flex justify-start mb-2"B> rt <"bottom"ip><"clear">',
                     buttons: [
                         'copy', 'excel', 'pdf', 'csv'
@@ -116,6 +116,8 @@
                 $(document).ready(function () {
                     $('.flex.justify-between.items-center.mb-4').insertBefore('.flex.justify-end.mb-4');
                 });
+
+
 
 
 

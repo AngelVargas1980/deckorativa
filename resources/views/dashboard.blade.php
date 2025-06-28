@@ -11,7 +11,7 @@
             <div class="bg-white p-6 rounded shadow">
                 <h3 class="text-lg font-bold mb-2">Nueva Cotización</h3>
                 <p class="mb-4">Genera una cotización para un cliente.</p>
-                <a href="{{ route('cotizaciones.create') }}" class="text-blue-600 hover:underline">Ir a cotizar</a>
+{{--                <a href="{{ route('cotizaciones.create') }}" class="text-blue-600 hover:underline">Ir a cotizar</a>--}}
             </div>
 
             <div class="bg-white p-6 rounded shadow">

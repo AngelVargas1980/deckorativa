@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.dt-button {
+    margin-right: 8px !important;
+    border-radius: 4px !important;
+    color: white !important;
+    padding: 6px 12px !important;
+}
+
+.dt-button.buttons-copy { background-color: #6b7280 !important; } /* gris */
+.dt-button.buttons-excel { background-color: #16a34a !important; } /* verde */
+.dt-button.buttons-pdf { background-color: #dc2626 !important; } /* rojo */
+.dt-button.buttons-csv { background-color: #2563eb !important; } /* azul */

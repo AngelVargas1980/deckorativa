@@ -18,10 +18,7 @@
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="identificacion" class="block font-medium">Identificación</label>
-                    <input type="text" name="identificacion" class="w-full border border-gray-300 rounded mt-1 p-2" required>
-                </div>
+
 
                 <div>
                     <label for="name" class="block font-medium">Nombres</label>
@@ -34,21 +31,21 @@
                 </div>
 
                 <div>
-                    <label for="email" class="block font-medium">Correo electrónico</label>
-                    <input type="email" name="email" class="w-full border border-gray-300 rounded mt-1 p-2" required>
+                    <label for="telefono" class="block font-medium">Teléfono</label>
+                    <input type="text" name="telefono" class="w-full border border-gray-300 rounded mt-1 p-2">
                 </div>
 
                 <div>
-                    <label for="telefono" class="block font-medium">Teléfono</label>
-                    <input type="text" name="telefono" class="w-full border border-gray-300 rounded mt-1 p-2">
+                    <label for="email" class="block font-medium">Correo electrónico</label>
+                    <input type="email" name="email" class="w-full border border-gray-300 rounded mt-1 p-2" required>
                 </div>
 
                 <div>
                     <label for="rol" class="block font-medium">Rol</label>
                     <select name="rol" class="w-full border border-gray-300 rounded mt-1 p-2">
                         <option value="Admin">Administrador</option>
-                        <option value="Asesor">Asesor</option>
-                        <option value="Cliente">Cliente</option>
+                        <option value="Asesor">Supervisor</option>
+                        <option value="Cliente">Asesor</option>
                     </select>
                 </div>
 
@@ -74,7 +71,7 @@
             </div>
 
             <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                <button type="submit" class="bg-blue-600 text-black px-4 py-2 rounded hover:bg-blue-700">
                     Guardar Usuario
                 </button>
             </div>

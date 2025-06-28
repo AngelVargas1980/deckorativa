@@ -37,9 +37,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
 });
 
+//Usuarios
+//Ver o consultar usuarios
+Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
+
 //Editar usuario
 Route::get('/usuarios/{id}/editar', [UserController::class, 'edit'])->name('usuarios.edit');
 Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
 
 //Eliminar usuario
 Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+

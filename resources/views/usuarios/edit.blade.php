@@ -24,8 +24,35 @@
             </div>
 
             <div class="mb-4">
+                <label class="block font-medium">Apellidos</label>
+                <input type="text" name="apellidos" value="{{ old('apellidos', $usuario->apellidos) }}" class="w-full border-gray-300 rounded mt-1">
+            </div>
+
+            <div class="mb-4">
                 <label class="block font-medium">Correo electrónico</label>
                 <input type="email" name="email" value="{{ old('email', $usuario->email) }}" class="w-full border-gray-300 rounded mt-1" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-medium">Teléfono</label>
+                <input type="text" name="telefono" value="{{ old('telefono', $usuario->telefono) }}" class="w-full border-gray-300 rounded mt-1">
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-medium">Rol</label>
+                <select name="rol" class="w-full border-gray-300 rounded mt-1">
+                    <option value="Administrador" {{ $usuario->rol == 'Administrador' ? 'selected' : '' }}>Administrador</option>
+                    <option value="Asesor" {{ $usuario->rol == 'Asesor' ? 'selected' : '' }}>Asesor</option>
+                    <option value="Cliente" {{ $usuario->rol == 'Cliente' ? 'selected' : '' }}>Cliente</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block font-medium">Estado</label>
+                <select name="estado" class="w-full border-gray-300 rounded mt-1">
+                    <option value="1" {{ $usuario->estado ? 'selected' : '' }}>Activo</option>
+                    <option value="0" {{ !$usuario->estado ? 'selected' : '' }}>Inactivo</option>
+                </select>
             </div>
 
             <div class="mb-4">
@@ -38,9 +65,12 @@
                 <input type="password" name="password_confirmation" class="w-full border-gray-300 rounded mt-1">
             </div>
 
-            <button type="submit" class="bg-blue-600 text-black px-4 py-2 rounded hover:bg-blue-700">
-                Actualizar Usuario
-            </button>
+            <div class="flex justify-end">
+                <button type="submit" class="bg-blue-600 text-black px-4 py-2 rounded hover:bg-blue-700">
+                    Actualizar Usuario
+                </button>
+            </div>
         </form>
     </div>
 @endsection
+

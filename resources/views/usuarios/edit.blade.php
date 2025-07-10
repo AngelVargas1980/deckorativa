@@ -66,9 +66,16 @@
             </div>
 
             <div class="flex justify-end">
-                <button type="submit" class="bg-blue-600 text-black px-4 py-2 rounded hover:bg-blue-700">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                     Actualizar Usuario
                 </button>
+
+                <a href="{{ route('usuarios.index') }}"
+                   class="inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">
+                    Cancelar
+                </a>
+
+
             </div>
         </form>
     </div>

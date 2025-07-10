@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('telefono')->nullable();    // ← campo nuevo
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+
             $table->string('password');
             $table->string('rol')->default('Cliente'); // ← campo nuevo
             $table->boolean('estado')->default(true);  // ← campo nuevo
@@ -31,6 +32,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+      Schema::dropIfExists('users');
     }
 };
+

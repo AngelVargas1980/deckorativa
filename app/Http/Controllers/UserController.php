@@ -12,10 +12,33 @@ class UserController extends Controller
 
     //Este es el metodo crear usuario
     public function index()
+
     {
-        $usuarios = User::all();
-        return view('usuarios.index', compact('usuarios'));
+        //Paginación de laravel
+
+    {
+        $cantidad = request('cantidad', 5);
+        if ($cantidad === 'all') {
+            $usuarios = User::get(); // O User::all()
+            $paginado = false;
+        } else {
+            $usuarios = User::paginate($cantidad);
+            $paginado = true;
+        }
+
+        return view('usuarios.index', compact('usuarios', 'paginado'));
+
     }
+
+
+        //paginación manual con DataTable
+//        $usuarios = User::paginate(5);  //Aquí cambiamos la paginación
+////        $usuarios = User::all();
+//        return view('usuarios.index', compact('usuarios'));
+
+    }
+
+
 
     public function create()
     {
@@ -95,6 +118,22 @@ class UserController extends Controller
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
+
+
+//    Para mostrar los usuarios eliminados
+    public function showDeleted(Request $request)
+    {
+        $cantidad = $request->get('cantidad', 5);
+
+        // Mostrar solo los usuarios eliminados
+        $usuarios = User::onlyTrashed()->paginate($cantidad); // Filtra para solo mostrar los usuarios eliminados.
+
+        return view('usuarios.eliminados', compact('usuarios'));
+
+
+    }
+
+
 
 
 }

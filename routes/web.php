@@ -48,3 +48,6 @@ Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.
 //Eliminar usuario
 Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 
+//Para mostrar los usuarios eliminados
+Route::get('usuarios/eliminados', [UserController::class, 'showDeleted'])->name('usuarios.eliminados');
+

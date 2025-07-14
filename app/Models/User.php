@@ -15,6 +15,9 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
+//    Para eliminar usuarios, pero no de la base de datos. Use SoftDeletes;
+    protected $dates = ['deleted_at'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -51,12 +54,7 @@ class User extends Authenticatable
     ];
 
 
-//    Para eliminar usuarios, pero no de la base de datos. Use SoftDeletes;
-
-
     // ...
-
-
 
 }
 

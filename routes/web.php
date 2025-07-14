@@ -15,7 +15,7 @@ use App\Http\Controllers\UserController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('public.inicio');
 });
 
 Route::get('/dashboard', function () {
@@ -35,19 +35,31 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
     Route::get('/usuarios/crear', [UserController::class, 'create'])->name('usuarios.create');
     Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
-});
 
-//Usuarios
+
+    //Usuarios
+
 //Ver o consultar usuarios
-Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
+    Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
 
 //Editar usuario
-Route::get('/usuarios/{id}/editar', [UserController::class, 'edit'])->name('usuarios.edit');
-Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
+    Route::get('/usuarios/{id}/editar', [UserController::class, 'edit'])->name('usuarios.edit');
+    Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
 
 //Eliminar usuario
-Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
+    Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 
 //Para mostrar los usuarios eliminados
-Route::get('usuarios/eliminados', [UserController::class, 'showDeleted'])->name('usuarios.eliminados');
+//Route::get('usuarios/eliminados', [UserController::class, 'showDeleted'])->name('usuarios.eliminados');
+    Route::get('/usuarios/eliminados', [UserController::class, 'eliminados'])->name('usuarios.eliminados');
+
+//Para mostrar los usuarios restaurados
+    Route::patch('/usuarios/{id}/restore', [UserController::class, 'restore'])->name('usuarios.restore');
+
+
+
+});
+
+
+
 

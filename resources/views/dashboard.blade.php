@@ -1,4 +1,6 @@
 
+
+
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -17,13 +19,13 @@
             <div class="bg-white p-6 rounded shadow">
                 <h3 class="text-lg font-bold mb-2">Administrar Productos</h3>
                 <p class="mb-4">Ver, crear o editar productos decorativos.</p>
-                <a href="{{ route('productos.index') }}" class="text-blue-600 hover:underline">Ver productos</a>
+{{--                <a href="{{ route('productos.index') }}" class="text-blue-600 hover:underline">Ver productos</a>--}}
             </div>
 
             <div class="bg-white p-6 rounded shadow">
                 <h3 class="text-lg font-bold mb-2">Servicios</h3>
                 <p class="mb-4">Gestiona los servicios ofrecidos a clientes.</p>
-                <a href="{{ route('servicios.index') }}" class="text-blue-600 hover:underline">Ver servicios</a>
+{{--                <a href="{{ route('servicios.index') }}" class="text-blue-600 hover:underline">Ver servicios</a>--}}
             </div>
         </div>
     </div>

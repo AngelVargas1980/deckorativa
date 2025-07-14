@@ -41,6 +41,11 @@
             <a href="/cotizaciones" class="block px-4 py-2 bg-black text-white rounded">📝 Cotizador</a>
             <a href="/productos" class="block px-4 py-2 bg-black text-white rounded">🎨 Productos</a>
             <a href="/pedidos" class="block px-4 py-2 bg-black text-white rounded">📦 Pedidos</a>
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">🚪 Cerrar sesión</button>
+            </form>
         </nav>
 
     </aside>

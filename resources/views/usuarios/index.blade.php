@@ -74,13 +74,13 @@
 
 
                         <!-- Formulario para restaurar el usuario eliminado -->
-                        @if ($usuario->trashed()) <!-- Verifica si el usuario está eliminado -->
-                        <form action="{{ route('usuarios.restore', $usuario->id) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700" title="Restaurar">🔄 </button>
-                        </form>
-                        @endif
+{{--                        @if ($usuario->trashed()) <!-- Verifica si el usuario está eliminado -->--}}
+{{--                        <form action="{{ route('usuarios.restore', $usuario->id) }}" method="POST" style="display: inline;">--}}
+{{--                            @csrf--}}
+{{--                            @method('PATCH')--}}
+{{--                            <button type="submit" class="bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700" title="Restaurar">🔄 </button>--}}
+{{--                        </form>--}}
+{{--                        @endif--}}
 
 
                         <!-- Formulario para eliminar el usuario -->

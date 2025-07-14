@@ -16,7 +16,7 @@ class UserController extends Controller
     {
         //Paginación de laravel
 
-    {
+
         $cantidad = request('cantidad', 5);
         if ($cantidad === 'all') {
             $usuarios = User::get(); // O User::all()
@@ -28,10 +28,7 @@ class UserController extends Controller
 
         return view('usuarios.index', compact('usuarios', 'paginado'));
 
-    }
-
-
-        //paginación manual con DataTable
+          //paginación manual con DataTable
 //        $usuarios = User::paginate(5);  //Aquí cambiamos la paginación
 ////        $usuarios = User::all();
 //        return view('usuarios.index', compact('usuarios'));
@@ -111,29 +108,25 @@ class UserController extends Controller
 
     //Este es metodo eliminar usuario
 
+    public function restore($id)
+    {
+        $usuario = User::onlyTrashed()->findOrFail($id);
+        $usuario->restore();
+
+        return redirect()->route('usuarios.eliminados')->with('success', 'Usuario restaurado correctamente.');
+    }
+
     public function destroy($id)
     {
-        $usuario = User::findOrFail($id);
-        $usuario->delete();
+        $usuario = User::withTrashed()->findOrFail($id);
 
-        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
+        if ($usuario->trashed()) {
+            $usuario->forceDelete();
+            return redirect()->route('usuarios.eliminados')->with('success', 'Usuario eliminado permanentemente.');
+        } else {
+            $usuario->delete();
+            return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
+        }
     }
-
-
-//    Para mostrar los usuarios eliminados
-    public function showDeleted(Request $request)
-    {
-        $cantidad = $request->get('cantidad', 5);
-
-        // Mostrar solo los usuarios eliminados
-        $usuarios = User::onlyTrashed()->paginate($cantidad); // Filtra para solo mostrar los usuarios eliminados.
-
-        return view('usuarios.eliminados', compact('usuarios'));
-
-
-    }
-
-
-
 
 }

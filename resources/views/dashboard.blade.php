@@ -1,54 +1,44 @@
+@extends('layouts.app')
 
+@section('content')
+    <h2 class="text-2xl font-bold mb-6">Bienvenido al Panel de Administración</h2>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Bienvenido al Cotizador Decorativo
-        </h2>
-    </x-slot>
-
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-white p-6 rounded shadow">
-                <h3 class="text-lg font-bold mb-2">Nueva Cotización</h3>
-                <p class="mb-4">Genera una cotización para un cliente.</p>
-{{--                <a href="{{ route('cotizaciones.create') }}" class="text-blue-600 hover:underline">Ir a cotizar</a>--}}
-            </div>
-
-            <div class="bg-white p-6 rounded shadow">
-                <h3 class="text-lg font-bold mb-2">Administrar Productos</h3>
-                <p class="mb-4">Ver, crear o editar productos decorativos.</p>
-{{--                <a href="{{ route('productos.index') }}" class="text-blue-600 hover:underline">Ver productos</a>--}}
-            </div>
-
-            <div class="bg-white p-6 rounded shadow">
-                <h3 class="text-lg font-bold mb-2">Servicios</h3>
-                <p class="mb-4">Gestiona los servicios ofrecidos a clientes.</p>
-{{--                <a href="{{ route('servicios.index') }}" class="text-blue-600 hover:underline">Ver servicios</a>--}}
-            </div>
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">👤 Usuarios</h3>
+            <p class="text-3xl font-extrabold text-blue-600">{{ $totalUsuarios }}</p>
         </div>
-    </div>
-</x-app-layout>
 
-
-
-{{--Esto venia en la vista original de dashboard.blade.php cuando se instalo breeze--}}
-
-{{--<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">🧑‍🤝‍🧑 Clientes</h3>
+            <p class="text-3xl font-extrabold text-green-600">{{ $totalClientes }}</p>
         </div>
+
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">📝 Cotizaciones</h3>
+            <p class="text-3xl font-extrabold text-yellow-600">{{ $totalCotizaciones }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">🎨 Productos</h3>
+            <p class="text-3xl font-extrabold text-purple-600">{{ $totalProductos }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">📦 Pedidos</h3>
+            <p class="text-3xl font-extrabold text-pink-600">{{ $totalPedidos }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">💌 Suscriptores</h3>
+            <p class="text-3xl font-extrabold text-indigo-600">{{ $totalSuscriptores }}</p>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow text-center">
+            <h3 class="text-lg font-bold mb-2">✉️ Mensajes</h3>
+            <p class="text-3xl font-extrabold text-red-600">{{ $totalMensajes }}</p>
+        </div>
+
     </div>
-</x-app-layout>--}}
+@endsection

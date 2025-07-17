@@ -61,8 +61,10 @@ Route::middleware(['auth'])->group(function () {
 //Route::get('usuarios/eliminados', [UserController::class, 'showDeleted'])->name('usuarios.eliminados');
     Route::get('/usuarios/eliminados', [UserController::class, 'eliminados'])->name('usuarios.eliminados');
 
+
 //Para mostrar los usuarios restaurados
     Route::patch('/usuarios/{id}/restore', [UserController::class, 'restore'])->name('usuarios.restore');
+
 
 
 

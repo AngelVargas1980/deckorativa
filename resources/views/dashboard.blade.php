@@ -41,4 +41,45 @@
         </div>
 
     </div>
+
+    <canvas id="graficaBarras" class="mt-10 bg-white p-4 rounded shadow"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ctx = document.getElementById('graficaBarras').getContext('2d');
+
+        const data = {
+            labels: @json($meses),
+            datasets: [{
+                label: 'Cotizaciones',
+                data: @json($datosCotizaciones),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        const graficaBarras = new Chart(ctx, config);
+    </script>
+
+
+
+
+
+
+
 @endsection

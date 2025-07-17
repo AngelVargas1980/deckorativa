@@ -26,7 +26,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($usuarios as $usuario)
+            @foreach ($usuariosEliminados as $usuario)
                 <tr>
                     <td class="border border-gray-300 px-4 py-2">{{ $usuario->id }}</td>
                     <td class="border border-gray-300 px-4 py-2">{{ $usuario->name }}</td>

@@ -28,7 +28,7 @@ class UserController extends Controller
 
         return view('usuarios.index', compact('usuarios', 'paginado'));
 
-          //paginación manual con DataTable
+        //paginación manual con DataTable
 //        $usuarios = User::paginate(5);  //Aquí cambiamos la paginación
 ////        $usuarios = User::all();
 //        return view('usuarios.index', compact('usuarios'));
@@ -130,3 +130,5 @@ class UserController extends Controller
     }
 
 }
+
+

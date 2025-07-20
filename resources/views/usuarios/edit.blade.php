@@ -41,9 +41,9 @@
             <div class="mb-4">
                 <label class="block font-medium">Rol</label>
                 <select name="rol" class="w-full border-gray-300 rounded mt-1">
-                    <option value="Administrador" {{ $usuario->rol == 'Administrador' ? 'selected' : '' }}>Administrador</option>
-                    <option value="Asesor" {{ $usuario->rol == 'Asesor' ? 'selected' : '' }}>Asesor</option>
-                    <option value="Cliente" {{ $usuario->rol == 'Cliente' ? 'selected' : '' }}>Cliente</option>
+                    <option value="Administrador" {{ $usuario->rol == 'Admin' ? 'selected' : '' }}>Administrador</option>
+                    <option value="Asesor" {{ $usuario->rol == 'Asesor' ? 'selected' : '' }}>Supervisor</option>
+                    <option value="Cliente" {{ $usuario->rol == 'Cliente' ? 'selected' : '' }}>Asesor</option>
                 </select>
             </div>
 

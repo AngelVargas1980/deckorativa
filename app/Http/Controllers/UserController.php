@@ -42,12 +42,15 @@ class UserController extends Controller
         return view('usuarios.create');
     }
 
+    //validar y guardar los datos del formulario de creación
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'rol' => 'required|string|in:Admin,Asesor,Cliente',  // Validación para rol
+            'estado' => 'required|boolean',  // Validación para estado
         ]);
 
         User::create([
@@ -56,8 +59,8 @@ class UserController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'rol' => $request->rol,
-            'estado' => $request->estado,
+            'rol' => $request->rol,   // Asignamos el rol
+            'estado' => $request->estado,  // Asignamos el estado
         ]);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');

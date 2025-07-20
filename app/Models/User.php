@@ -8,12 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
-
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
 
 //    Para eliminar usuarios, pero no de la base de datos. Use SoftDeletes;
     protected $dates = ['deleted_at'];
@@ -53,13 +52,7 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    //Roles para los usuarios
-    public function role()
-    {
-        return $this->belongsTo(Role::class); // Relación con el modelo Role
-    }
 
-    // ...
 
 }
 

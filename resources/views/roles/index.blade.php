@@ -39,7 +39,7 @@
         {{-- Tabla --}}
         <table id="tablaRoles" class="table-auto w-full text-center border-collapse border border-gray-300 bg-white shadow rounded">
 
-        <thead class="bg-gray-100">
+            <thead class="bg-gray-100">
             <tr>
                 <th class="border border-gray-300 px-4 py-2 text-center">ID</th>
                 <th class="border border-gray-300 px-4 py-2 text-center">Nombre</th>
@@ -110,3 +110,4 @@
         </script>
     @endpush
 @endsection
+

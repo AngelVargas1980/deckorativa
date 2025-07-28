@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
 
 class RoleSeeder extends Seeder
 {
@@ -13,9 +15,38 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::firstOrCreate(['name' => 'Admin']);
-        Role::firstOrCreate(['name' => 'Asesor']);
-        Role::firstOrCreate(['name' => 'Supervisor']);
+        // Crear roles si no existen
+        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
+        $asesorRole = Role::firstOrCreate(['name' => 'Asesor']);
+        $supervisorRole = Role::firstOrCreate(['name' => 'Supervisor']);
 
+        // Crear permisos si no existen
+        $permissions = [
+            'create roles', 'edit roles', 'delete roles', 'view roles',
+            'create productos', 'edit productos', 'delete productos', 'view productos',
+            'create pedidos', 'edit pedidos', 'delete pedidos', 'view pedidos',
+            'create cotizador', 'edit cotizador', 'delete cotizador', 'view cotizador'
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
+
+        // Asignar permisos a los roles
+        $adminRole->givePermissionTo([
+            'create roles', 'edit roles', 'delete roles', 'view roles',
+            'create productos', 'edit productos', 'delete productos', 'view productos',
+            'create pedidos', 'edit pedidos', 'delete pedidos', 'view pedidos',
+            'create cotizador', 'edit cotizador', 'delete cotizador', 'view cotizador'
+        ]);
+
+        $asesorRole->givePermissionTo([
+            'view productos', 'view pedidos', 'view cotizador' // Asesor puede ver
+        ]);
+
+        $supervisorRole->givePermissionTo([
+            'create productos', 'edit productos', 'view productos',
+            'create pedidos', 'edit pedidos', 'view pedidos',
+        ]);
     }
 }

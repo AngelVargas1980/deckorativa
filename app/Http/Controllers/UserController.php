@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\User;
 use Illuminate\Http\Request;
-
+use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
 {
-
-    //Este es el metodo crear usuario
-    public function index()
-
+    public function __construct()
     {
-        //Paginación de laravel
+        $this->middleware('auth');  // Protege las rutas
+    }
 
+    // Mostrar lista de usuarios
+    public function index()
+    {
+        $this->authorize('view users');  // Verifica permiso para ver usuarios
 
+        // Paginación
         $cantidad = request('cantidad', 5);
         if ($cantidad === 'all') {
-            $usuarios = User::get(); // O User::all()
+            $usuarios = User::get();
             $paginado = false;
         } else {
             $usuarios = User::paginate($cantidad);
@@ -27,30 +29,24 @@ class UserController extends Controller
         }
 
         return view('usuarios.index', compact('usuarios', 'paginado'));
-
-        //paginación manual con DataTable
-//        $usuarios = User::paginate(5);  //Aquí cambiamos la paginación
-////        $usuarios = User::all();
-//        return view('usuarios.index', compact('usuarios'));
-
     }
 
-
-
+    // Crear nuevo usuario
     public function create()
     {
+        $this->authorize('create users');  // Verifica permiso para crear usuarios
         return view('usuarios.create');
     }
 
-    //validar y guardar los datos del formulario de creación
+    // Guardar usuario nuevo
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'rol' => 'required|string|in:Admin,Asesor,Cliente',  // Validación para rol
-            'estado' => 'required|boolean',  // Validación para estado
+            'rol' => 'required|string|in:Admin,Asesor,Cliente',
+            'estado' => 'required|boolean',
         ]);
 
         User::create([
@@ -59,31 +55,34 @@ class UserController extends Controller
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'rol' => $request->rol,   // Asignamos el rol
-            'estado' => $request->estado,  // Asignamos el estado
+            'rol' => $request->rol,
+            'estado' => $request->estado,
         ]);
 
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
     }
 
-
-    //Consultar usuarios
+    // Ver detalles del usuario
     public function show($id)
     {
+        $this->authorize('view users');  // Verifica permiso para ver usuarios
         $usuario = User::findOrFail($id);
         return view('usuarios.show', compact('usuario'));
     }
 
-
-    //Este es el metodo editar usuario
+    // Editar usuario
     public function edit($id)
     {
+        $this->authorize('edit users');  // Verifica permiso para editar usuarios
         $usuario = User::findOrFail($id);
         return view('usuarios.edit', compact('usuario'));
     }
 
+    // Actualizar usuario
     public function update(Request $request, $id)
     {
+        $this->authorize('edit users');  // Verifica permiso para editar usuarios
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
@@ -108,19 +107,20 @@ class UserController extends Controller
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
-
-    //Este es metodo eliminar usuario
-
+    // Restaurar usuario eliminado
     public function restore($id)
     {
+        $this->authorize('restore users');  // Verifica permiso para restaurar usuarios
         $usuario = User::onlyTrashed()->findOrFail($id);
         $usuario->restore();
 
         return redirect()->route('usuarios.eliminados')->with('success', 'Usuario restaurado correctamente.');
     }
 
+    // Eliminar usuario
     public function destroy($id)
     {
+        $this->authorize('delete users');  // Verifica permiso para eliminar usuarios
         $usuario = User::withTrashed()->findOrFail($id);
 
         if ($usuario->trashed()) {
@@ -131,7 +131,4 @@ class UserController extends Controller
             return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado correctamente.');
         }
     }
-
 }
-
-

@@ -13,11 +13,19 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
+
+
         // Módulo Roles
         Permission::create(['name' => 'create roles']);
         Permission::create(['name' => 'edit roles']);
         Permission::create(['name' => 'delete roles']);
         Permission::create(['name' => 'view roles']);
+
+        // Módulo Usuarios
+        Permission::create(['name' => 'create users']);
+        Permission::create(['name' => 'edit users']);
+        Permission::create(['name' => 'delete users']);
+        Permission::create(['name' => 'view users']);
 
         // Módulo Productos
         Permission::create(['name' => 'create productos']);

@@ -16,7 +16,10 @@ class UserController extends Controller
     // Mostrar lista de usuarios
     public function index()
     {
-        $this->authorize('view users');  // Verifica permiso para ver usuarios
+        // Verifica permiso para ver usuarios
+        if (!auth()->user()->can('view users')) {
+            abort(403, 'Unauthorized action.');
+        }
 
         // Paginación
         $cantidad = request('cantidad', 5);
@@ -34,7 +37,10 @@ class UserController extends Controller
     // Crear nuevo usuario
     public function create()
     {
-        $this->authorize('create users');  // Verifica permiso para crear usuarios
+        // Verifica permiso para crear usuarios
+        if (!auth()->user()->can('create users')) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('usuarios.create');
     }
 
@@ -45,27 +51,37 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'rol' => 'required|string|in:Admin,Asesor,Cliente',
+            'rol' => 'required|string|in:Admin,Asesor,Supervisor',  //Roles permitidos
             'estado' => 'required|boolean',
         ]);
 
-        User::create([
+        //Crear el usuario en la base de datos
+        // Crear el usuario y asignarlo a la variable $usuario
+        $usuario = User::create([
             'name' => $request->name,
             'apellidos' => $request->apellidos,
             'telefono' => $request->telefono,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'rol' => $request->rol,
             'estado' => $request->estado,
+            'rol' => $request->rol, // Guardar el rol en la base de datos
         ]);
 
+// Asignar el rol al usuario
+        $usuario->assignRole($request->rol);  // Asigna el rol al usuario
+
+// Redirigir con mensaje de éxito
         return redirect()->route('usuarios.index')->with('success', 'Usuario creado correctamente.');
-    }
+        }
+
 
     // Ver detalles del usuario
     public function show($id)
     {
-        $this->authorize('view users');  // Verifica permiso para ver usuarios
+        // Verifica permiso para ver usuarios
+        if (!auth()->user()->can('view users')) {
+            abort(403, 'Unauthorized action.');
+        }
         $usuario = User::findOrFail($id);
         return view('usuarios.show', compact('usuario'));
     }
@@ -73,7 +89,11 @@ class UserController extends Controller
     // Editar usuario
     public function edit($id)
     {
-        $this->authorize('edit users');  // Verifica permiso para editar usuarios
+        // Verifica permiso para ver usuarios
+        if (!auth()->user()->can('edit users')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $usuario = User::findOrFail($id);
         return view('usuarios.edit', compact('usuario'));
     }
@@ -81,7 +101,11 @@ class UserController extends Controller
     // Actualizar usuario
     public function update(Request $request, $id)
     {
-        $this->authorize('edit users');  // Verifica permiso para editar usuarios
+
+        // Verifica permiso para ver usuarios
+        if (!auth()->user()->can('edit users')) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -110,7 +134,12 @@ class UserController extends Controller
     // Restaurar usuario eliminado
     public function restore($id)
     {
-        $this->authorize('restore users');  // Verifica permiso para restaurar usuarios
+
+        // Verifica permiso para ver usuarios
+        if (!auth()->user()->can('restore users')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $usuario = User::onlyTrashed()->findOrFail($id);
         $usuario->restore();
 
@@ -120,7 +149,11 @@ class UserController extends Controller
     // Eliminar usuario
     public function destroy($id)
     {
-        $this->authorize('delete users');  // Verifica permiso para eliminar usuarios
+        // Verifica permiso para ver usuarios
+        if (!auth()->user()->can('delete users')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $usuario = User::withTrashed()->findOrFail($id);
 
         if ($usuario->trashed()) {

@@ -23,6 +23,7 @@ class RoleSeeder extends Seeder
         // Crear permisos si no existen
         $permissions = [
             'create roles', 'edit roles', 'delete roles', 'view roles',
+            'create users', 'edit users', 'delete users', 'view users',
             'create productos', 'edit productos', 'delete productos', 'view productos',
             'create pedidos', 'edit pedidos', 'delete pedidos', 'view pedidos',
             'create cotizador', 'edit cotizador', 'delete cotizador', 'view cotizador'
@@ -35,18 +36,21 @@ class RoleSeeder extends Seeder
         // Asignar permisos a los roles
         $adminRole->givePermissionTo([
             'create roles', 'edit roles', 'delete roles', 'view roles',
+            'view users', 'create users', 'edit users', 'delete users',
             'create productos', 'edit productos', 'delete productos', 'view productos',
             'create pedidos', 'edit pedidos', 'delete pedidos', 'view pedidos',
             'create cotizador', 'edit cotizador', 'delete cotizador', 'view cotizador'
         ]);
 
         $asesorRole->givePermissionTo([
-            'view productos', 'view pedidos', 'view cotizador' // Asesor puede ver
+            'view productos', 'view pedidos', 'view cotizador', // Asesor puede ver
+            'view users',
         ]);
 
         $supervisorRole->givePermissionTo([
             'create productos', 'edit productos', 'view productos',
             'create pedidos', 'edit pedidos', 'view pedidos',
+            'view users',
         ]);
     }
 }

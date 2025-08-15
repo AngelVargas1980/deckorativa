@@ -4,11 +4,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\ProductoController;
+
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Facades\Permission;
 use Spatie\Permission\Middlewares\RoleMiddleware;
 use Spatie\Permission\Middlewares\PermissionMiddleware;
+
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ProductoController;
 
 /*
 |--------------------------------------------------------------------------|
@@ -64,6 +67,12 @@ Route::middleware(['auth'])->group(function () {
 //    Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');  // Asesor solo puede ver usuarios
 //});
 
+    Route::resource('clients', ClientController::class);
+
+
+
+// Rutas para el controlador Producto
+    Route::resource('productos', ProductoController::class);
 
 
 });

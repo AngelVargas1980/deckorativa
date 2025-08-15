@@ -45,7 +45,7 @@
 {{--            <a href="/usuarios" class="block px-4 py-2 bg-black text-white rounded">👤 Usuarios</a>--}}
 
 
-            <a href="/clientes" class="block px-4 py-2 bg-black text-white rounded">🧑‍🤝‍🧑 Clientes</a>
+            <a href="/clients" class="block px-4 py-2 bg-black text-white rounded">🧑‍🤝‍🧑 Clientes</a>
             <a href="/cotizaciones" class="block px-4 py-2 bg-black text-white rounded">📝 Cotizador</a>
             <a href="/productos" class="block px-4 py-2 bg-black text-white rounded">🎨 Productos</a>
             <a href="/pedidos" class="block px-4 py-2 bg-black text-white rounded">📦 Pedidos</a>

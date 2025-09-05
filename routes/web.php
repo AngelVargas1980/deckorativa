@@ -35,12 +35,14 @@ Route::middleware(['auth'])->group(function () {
     // Rutas de Roles (Accesibles solo por Admin)
     Route::middleware(['role:Admin'])->group(function () {
         Route::resource('roles', RoleController::class);
+        Route::get('roles-users', [RoleController::class, 'users'])->name('roles.users');
+        Route::post('users/{user}/role', [RoleController::class, 'updateUserRole'])->name('roles.updateUserRole');
 
 
     // Rutas de Usuarios (Accesibles solo para Admin)
-        Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
         Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');  // Solo Admin puede ver usuarios
         Route::get('/usuarios/crear', [UserController::class, 'create'])->name('usuarios.create');  // Crear usuarios solo Admin
+        Route::get('/usuarios/{id}', [UserController::class, 'show'])->name('usuarios.show');
         Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');  // Crear usuarios solo Admin
         Route::get('/usuarios/{id}/editar', [UserController::class, 'edit'])->name('usuarios.edit');  // Editar usuarios solo Admin
         Route::put('/usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');  // Editar usuarios solo Admin

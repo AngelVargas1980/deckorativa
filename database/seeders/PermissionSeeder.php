@@ -13,37 +13,28 @@ class PermissionSeeder extends Seeder
      */
     public function run(): void
     {
+        // SOLO los 4 módulos principales
+        
+        // Dashboard
+        Permission::firstOrCreate(['name' => 'view dashboard']);
 
+        // Roles
+        Permission::firstOrCreate(['name' => 'create roles']);
+        Permission::firstOrCreate(['name' => 'edit roles']);
+        Permission::firstOrCreate(['name' => 'delete roles']);
+        Permission::firstOrCreate(['name' => 'view roles']);
 
-        // Módulo Roles
-        Permission::create(['name' => 'create roles']);
-        Permission::create(['name' => 'edit roles']);
-        Permission::create(['name' => 'delete roles']);
-        Permission::create(['name' => 'view roles']);
+        // Usuarios  
+        Permission::firstOrCreate(['name' => 'create users']);
+        Permission::firstOrCreate(['name' => 'edit users']);
+        Permission::firstOrCreate(['name' => 'delete users']);
+        Permission::firstOrCreate(['name' => 'view users']);
 
-        // Módulo Usuarios
-        Permission::create(['name' => 'create users']);
-        Permission::create(['name' => 'edit users']);
-        Permission::create(['name' => 'delete users']);
-        Permission::create(['name' => 'view users']);
-
-        // Módulo Productos
-        Permission::create(['name' => 'create productos']);
-        Permission::create(['name' => 'edit productos']);
-        Permission::create(['name' => 'delete productos']);
-        Permission::create(['name' => 'view productos']);
-
-        // Módulo Pedidos
-        Permission::create(['name' => 'create pedidos']);
-        Permission::create(['name' => 'edit pedidos']);
-        Permission::create(['name' => 'delete pedidos']);
-        Permission::create(['name' => 'view pedidos']);
-
-        // Módulo Cotizador
-        Permission::create(['name' => 'create cotizador']);
-        Permission::create(['name' => 'edit cotizador']);
-        Permission::create(['name' => 'delete cotizador']);
-        Permission::create(['name' => 'view cotizador']);
-
+        // Clientes
+        Permission::firstOrCreate(['name' => 'create clients']);
+        Permission::firstOrCreate(['name' => 'edit clients']);
+        Permission::firstOrCreate(['name' => 'delete clients']);
+        Permission::firstOrCreate(['name' => 'view clients']);
+        Permission::firstOrCreate(['name' => 'view clients readonly']);
     }
 }

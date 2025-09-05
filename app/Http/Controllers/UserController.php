@@ -41,17 +41,24 @@ class UserController extends Controller
         if (!auth()->user()->can('create users')) {
             abort(403, 'Unauthorized action.');
         }
-        return view('usuarios.create');
+        
+        // Obtener roles dinámicos
+        $roles = \Spatie\Permission\Models\Role::all();
+        
+        return view('usuarios.create', compact('roles'));
     }
 
     // Guardar usuario nuevo
     public function store(Request $request)
     {
+        // Obtener roles disponibles dinámicamente
+        $availableRoles = \Spatie\Permission\Models\Role::pluck('name')->toArray();
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'rol' => 'required|string|in:Admin,Asesor,Supervisor',  //Roles permitidos
+            'rol' => 'required|string|in:' . implode(',', $availableRoles),  //Roles dinámicos
             'estado' => 'required|boolean',
         ]);
 
@@ -118,8 +125,16 @@ class UserController extends Controller
         $usuario->apellidos = $request->apellidos;
         $usuario->email = $request->email;
         $usuario->telefono = $request->telefono;
-        $usuario->rol = $request->rol;
-        $usuario->estado = $request->estado;
+        
+        // Proteger al usuario admin principal
+        if ($usuario->email === 'admin@deckorativa.com') {
+            // El admin principal mantiene su rol y estado
+            $usuario->rol = 'Admin';
+            $usuario->estado = 1;
+        } else {
+            $usuario->rol = $request->rol;
+            $usuario->estado = $request->estado;
+        }
 
         if ($request->filled('password')) {
             $request->validate(['password' => 'confirmed|min:6']);
@@ -155,6 +170,11 @@ class UserController extends Controller
         }
 
         $usuario = User::withTrashed()->findOrFail($id);
+        
+        // Proteger al usuario admin principal
+        if ($usuario->email === 'admin@deckorativa.com') {
+            return redirect()->route('usuarios.index')->with('error', 'El usuario administrador principal no puede ser eliminado por seguridad del sistema.');
+        }
 
         if ($usuario->trashed()) {
             $usuario->forceDelete();

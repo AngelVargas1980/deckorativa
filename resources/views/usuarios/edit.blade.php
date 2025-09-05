@@ -40,19 +40,43 @@
 
             <div class="mb-4">
                 <label class="block font-medium">Rol</label>
-                <select name="rol" class="w-full border-gray-300 rounded mt-1">
-                    <option value="Administrador" {{ $usuario->rol == 'Admin' ? 'selected' : '' }}>Administrador</option>
-                    <option value="Asesor" {{ $usuario->rol == 'Asesor' ? 'selected' : '' }}>Supervisor</option>
-                    <option value="Cliente" {{ $usuario->rol == 'Cliente' ? 'selected' : '' }}>Asesor</option>
-                </select>
+                @if($usuario->email === 'admin@deckorativa.com')
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-lock text-amber-600 mr-2"></i>
+                            <span class="font-semibold text-amber-800">Administrador</span>
+                            <span class="ml-2 text-amber-700">(Protegido)</span>
+                        </div>
+                        <p class="text-sm text-amber-600 mt-1">El rol del usuario administrador principal no puede ser modificado</p>
+                    </div>
+                    <input type="hidden" name="rol" value="Admin">
+                @else
+                    <select name="rol" class="w-full border-gray-300 rounded mt-1">
+                        <option value="Admin" {{ $usuario->rol == 'Admin' ? 'selected' : '' }}>Administrador</option>
+                        <option value="Supervisor" {{ $usuario->rol == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
+                        <option value="Asesor" {{ $usuario->rol == 'Asesor' ? 'selected' : '' }}>Asesor</option>
+                    </select>
+                @endif
             </div>
 
             <div class="mb-4">
                 <label class="block font-medium">Estado</label>
-                <select name="estado" class="w-full border-gray-300 rounded mt-1">
-                    <option value="1" {{ $usuario->estado ? 'selected' : '' }}>Activo</option>
-                    <option value="0" {{ !$usuario->estado ? 'selected' : '' }}>Inactivo</option>
-                </select>
+                @if($usuario->email === 'admin@deckorativa.com')
+                    <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span class="font-semibold text-green-800">Activo</span>
+                            <span class="ml-2 text-green-700">(Protegido)</span>
+                        </div>
+                        <p class="text-sm text-green-600 mt-1">El usuario administrador principal siempre debe estar activo</p>
+                    </div>
+                    <input type="hidden" name="estado" value="1">
+                @else
+                    <select name="estado" class="w-full border-gray-300 rounded mt-1">
+                        <option value="1" {{ $usuario->estado ? 'selected' : '' }}>Activo</option>
+                        <option value="0" {{ !$usuario->estado ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                @endif
             </div>
 
             <div class="mb-4">
@@ -74,8 +98,6 @@
                    class="inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">
                     Cancelar
                 </a>
-
-
             </div>
         </form>
     </div>

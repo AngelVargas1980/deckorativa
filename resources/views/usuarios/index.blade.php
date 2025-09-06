@@ -15,12 +15,6 @@
                     </p>
                 </div>
                 <div class="mt-6 lg:mt-0 flex flex-col sm:flex-row gap-3">
-                    @can('view users')
-                    <a href="{{ route('usuarios.eliminados') }}" class="btn-outline btn-sm">
-                        <i class="fas fa-trash-restore mr-2"></i>
-                        Usuarios Eliminados
-                    </a>
-                    @endcan
                     @can('create users')
                     <a href="{{ route('usuarios.create') }}" class="btn-primary">
                         <i class="fas fa-user-plus mr-2"></i>

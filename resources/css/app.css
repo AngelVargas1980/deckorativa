@@ -220,6 +220,10 @@
 .dt-button.buttons-csv { background-color: #3B82F6 !important; }
 
 /* DataTables Search */
+.dataTables_filter {
+    margin: 0 16px 16px 16px !important;
+}
+
 div.dataTables_filter label {
     display: flex;
     align-items: center;
@@ -256,6 +260,11 @@ div.dataTables_filter label input:focus {
     background: #0597A7 !important;
     color: white !important;
     border-color: #0597A7 !important;
+}
+
+/* DataTables Buttons - Solo agregar margen */
+.dt-buttons {
+    margin: 16px 16px 16px 16px !important;
 }
 
 /* ===== UTILIDADES ADICIONALES ===== */

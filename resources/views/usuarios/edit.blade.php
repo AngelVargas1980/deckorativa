@@ -52,9 +52,11 @@
                     <input type="hidden" name="rol" value="Admin">
                 @else
                     <select name="rol" class="w-full border-gray-300 rounded mt-1">
-                        <option value="Admin" {{ $usuario->rol == 'Admin' ? 'selected' : '' }}>Administrador</option>
-                        <option value="Supervisor" {{ $usuario->rol == 'Supervisor' ? 'selected' : '' }}>Supervisor</option>
-                        <option value="Asesor" {{ $usuario->rol == 'Asesor' ? 'selected' : '' }}>Asesor</option>
+                        @foreach($roles as $role)
+                            <option value="{{ $role->name }}" {{ $usuario->rol == $role->name ? 'selected' : '' }}>
+                                {{ ucfirst($role->name) }}
+                            </option>
+                        @endforeach
                     </select>
                 @endif
             </div>

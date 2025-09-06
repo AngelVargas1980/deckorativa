@@ -26,6 +26,17 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-red-800 font-medium">{{ session('error') }}</span>
+            </div>
+        </div>
+    @endif
+
     <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-bold text-gray-900">Usuarios del Sistema</h3>
@@ -85,20 +96,34 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                <form method="POST" action="{{ route('roles.updateUserRole', $user) }}" class="flex items-center space-x-2">
-                                    @csrf
-                                    <select name="role" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                        <option value="">Seleccionar rol...</option>
-                                        @foreach($roles as $role)
-                                            <option value="{{ $role->name }}" {{ $user->hasRole($role->name) ? 'selected' : '' }}>
-                                                {{ $role->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                                        Cambiar
-                                    </button>
-                                </form>
+                                @if($user->email === 'admin@deckorativa.com')
+                                    <div class="flex items-center space-x-2">
+                                        <div class="bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-500">
+                                            Usuario protegido
+                                        </div>
+                                        <div class="inline-flex items-center justify-center w-8 h-8 text-amber-600 bg-amber-50 rounded-lg border border-amber-200" 
+                                             title="Usuario protegido - No se puede cambiar el rol">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                @else
+                                    <form method="POST" action="{{ route('roles.updateUserRole', $user) }}" class="flex items-center space-x-2">
+                                        @csrf
+                                        <select name="role" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                            <option value="">Seleccionar rol...</option>
+                                            @foreach($roles as $role)
+                                                <option value="{{ $role->name }}" {{ $user->hasRole($role->name) ? 'selected' : '' }}>
+                                                    {{ $role->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                            Cambiar
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center space-x-2">

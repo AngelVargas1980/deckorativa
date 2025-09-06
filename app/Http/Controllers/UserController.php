@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 
 class UserController extends Controller
@@ -56,7 +57,11 @@ class UserController extends Controller
         
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
+            'email' => [
+                'required',
+                'email',
+                \Illuminate\Validation\Rule::unique('users')->whereNull('deleted_at')
+            ],
             'password' => 'required|string|min:6|confirmed',
             'rol' => 'required|string|in:' . implode(',', $availableRoles),  //Roles dinámicos
             'estado' => 'required|boolean',
@@ -102,7 +107,11 @@ class UserController extends Controller
         }
 
         $usuario = User::findOrFail($id);
-        return view('usuarios.edit', compact('usuario'));
+        
+        // Obtener roles dinámicos
+        $roles = \Spatie\Permission\Models\Role::all();
+        
+        return view('usuarios.edit', compact('usuario', 'roles'));
     }
 
     // Actualizar usuario
@@ -116,7 +125,11 @@ class UserController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $id,
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($id)->whereNull('deleted_at')
+            ],
         ]);
 
         $usuario = User::findOrFail($id);

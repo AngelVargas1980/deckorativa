@@ -83,9 +83,10 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
-        if (in_array($role->name, ['Admin', 'Asesor', 'Supervisor'])) {
+        // Solo proteger el rol Admin
+        if ($role->name === 'Admin') {
             return redirect()->route('roles.index')
-                ->with('error', 'No se pueden eliminar los roles del sistema.');
+                ->with('error', 'El rol Admin no se puede eliminar por seguridad del sistema.');
         }
 
         if ($role->users()->count() > 0) {
@@ -109,6 +110,12 @@ class RoleController extends Controller
 
     public function updateUserRole(Request $request, User $user)
     {
+        // Proteger al usuario administrador principal
+        if ($user->email === 'admin@deckorativa.com') {
+            return redirect()->route('roles.users')
+                ->with('error', 'El usuario administrador principal no puede cambiar de rol por seguridad del sistema.');
+        }
+
         $request->validate([
             'role' => 'required|exists:roles,name'
         ]);

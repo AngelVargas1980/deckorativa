@@ -14,7 +14,7 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         // SOLO los 4 módulos principales
-        
+
         // Dashboard
         Permission::firstOrCreate(['name' => 'view dashboard']);
 
@@ -24,7 +24,7 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'delete roles']);
         Permission::firstOrCreate(['name' => 'view roles']);
 
-        // Usuarios  
+        // Usuarios
         Permission::firstOrCreate(['name' => 'create users']);
         Permission::firstOrCreate(['name' => 'edit users']);
         Permission::firstOrCreate(['name' => 'delete users']);
@@ -36,5 +36,26 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'delete clients']);
         Permission::firstOrCreate(['name' => 'view clients']);
         Permission::firstOrCreate(['name' => 'view clients readonly']);
+
+        // Categorías
+        Permission::firstOrCreate(['name' => 'create categorias']);
+        Permission::firstOrCreate(['name' => 'edit categorias']);
+        Permission::firstOrCreate(['name' => 'delete categorias']);
+        Permission::firstOrCreate(['name' => 'view categorias']);
+
+        // Servicios
+        Permission::firstOrCreate(['name' => 'create servicios']);
+        Permission::firstOrCreate(['name' => 'edit servicios']);
+        Permission::firstOrCreate(['name' => 'delete servicios']);
+        Permission::firstOrCreate(['name' => 'view servicios']);
+
+        // Cotizaciones
+        Permission::firstOrCreate(['name' => 'create cotizaciones']);
+        Permission::firstOrCreate(['name' => 'edit cotizaciones']);
+        Permission::firstOrCreate(['name' => 'delete cotizaciones']);
+        Permission::firstOrCreate(['name' => 'view cotizaciones']);
+        Permission::firstOrCreate(['name' => 'generate pdf cotizaciones']);
+        Permission::firstOrCreate(['name' => 'send email cotizaciones']);
+        Permission::firstOrCreate(['name' => 'change state cotizaciones']);
     }
 }

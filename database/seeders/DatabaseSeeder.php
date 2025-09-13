@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            CategoriaSeeder::class,
+            ServicioSeeder::class,
         ]);
 
         // Solo crear el usuario administrador principal

@@ -12,6 +12,9 @@ use Spatie\Permission\Middlewares\PermissionMiddleware;
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\CotizacionController;
 
 /*
 |--------------------------------------------------------------------------|
@@ -71,7 +74,19 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('clients', ClientController::class);
 
-
+    // Rutas para HU8: Gestión de Servicios, Productos y Categorías
+    Route::resource('categorias', CategoriaController::class)->middleware('permission:view categorias');
+    Route::resource('servicios', ServicioController::class)->middleware('permission:view servicios');
+    
+    // Rutas API para obtener datos dinámicamente
+    Route::get('/api/categorias', [CategoriaController::class, 'obtenerCategorias'])->name('api.categorias')->middleware('permission:view categorias');
+    Route::get('/api/servicios', [ServicioController::class, 'obtenerServicios'])->name('api.servicios')->middleware('permission:view servicios');
+    
+    // Rutas para HU7: Módulo de Cotización  
+    Route::resource('cotizaciones', CotizacionController::class)->parameters(['cotizaciones' => 'cotizacion'])->middleware('permission:view cotizaciones');
+    Route::patch('/cotizaciones/{cotizacion}/estado', [CotizacionController::class, 'cambiarEstado'])->name('cotizaciones.cambiarEstado')->middleware('permission:change state cotizaciones');
+    Route::get('/cotizaciones/{cotizacion}/pdf', [CotizacionController::class, 'generarPDF'])->name('cotizaciones.pdf')->middleware('permission:generate pdf cotizaciones');
+    Route::post('/cotizaciones/{cotizacion}/enviar', [CotizacionController::class, 'enviarEmail'])->name('cotizaciones.enviar')->middleware('permission:send email cotizaciones');
 
 // Rutas para el controlador Producto
     Route::resource('productos', ProductoController::class);

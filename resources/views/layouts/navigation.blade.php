@@ -37,6 +37,33 @@
                         <span class="font-medium">Clientes</span>
                     </x-nav-link>
 
+                    @can('view categorias')
+                        <x-nav-link :href="route('categorias.index')" :active="request()->routeIs('categorias.*')" class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM9 9h6v6H9V9z"></path>
+                            </svg>
+                            <span class="font-medium">Categorías</span>
+                        </x-nav-link>
+                    @endcan
+
+                    @can('view servicios')
+                        <x-nav-link :href="route('servicios.index')" :active="request()->routeIs('servicios.*')" class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l5.5-3.5L16 21z"></path>
+                            </svg>
+                            <span class="font-medium">Servicios</span>
+                        </x-nav-link>
+                    @endcan
+
+                    @can('view cotizaciones')
+                        <x-nav-link :href="route('cotizaciones.index')" :active="request()->routeIs('cotizaciones.*')" class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="font-medium">Cotizaciones</span>
+                        </x-nav-link>
+                    @endcan
+
                     @role('Admin')
                         <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')" class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                             <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,6 +147,33 @@
                 </svg>
                 <span>Clientes</span>
             </x-responsive-nav-link>
+
+            @can('view categorias')
+                <x-responsive-nav-link :href="route('categorias.index')" :active="request()->routeIs('categorias.*')" class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zM9 9h6v6H9V9z"></path>
+                    </svg>
+                    <span>Categorías</span>
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view servicios')
+                <x-responsive-nav-link :href="route('servicios.index')" :active="request()->routeIs('servicios.*')" class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l5.5-3.5L16 21z"></path>
+                    </svg>
+                    <span>Servicios</span>
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('view cotizaciones')
+                <x-responsive-nav-link :href="route('cotizaciones.index')" :active="request()->routeIs('cotizaciones.*')" class="flex items-center space-x-2">
+                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Cotizaciones</span>
+                </x-responsive-nav-link>
+            @endcan
 
             @role('Admin')
                 <x-responsive-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')" class="flex items-center space-x-2">

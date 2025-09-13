@@ -17,4 +17,18 @@ class Client extends Model
         'email_verified',
         'identification_number',
     ];
+
+    protected $casts = [
+        'email_verified' => 'boolean',
+    ];
+
+    public function getNameAttribute()
+    {
+        return trim($this->first_name . ' ' . $this->last_name);
+    }
+
+    public function cotizaciones()
+    {
+        return $this->hasMany(Cotizacion::class);
+    }
 }

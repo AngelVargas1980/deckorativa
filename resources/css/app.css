@@ -55,7 +55,7 @@
 
     /* Cards */
     .card {
-        @apply bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden;
+        @apply bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden p-6;
     }
     
     .card-header {

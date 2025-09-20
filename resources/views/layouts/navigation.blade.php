@@ -64,6 +64,15 @@
                         </x-nav-link>
                     @endcan
 
+                    @can('view pedidos')
+                        <x-nav-link :href="route('pedidos.index')" :active="request()->routeIs('pedidos.*')" class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            </svg>
+                            <span class="font-medium">Pedidos</span>
+                        </x-nav-link>
+                    @endcan
+
                     @role('Admin')
                         <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')" class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                             <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

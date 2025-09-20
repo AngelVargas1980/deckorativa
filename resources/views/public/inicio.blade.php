@@ -58,13 +58,19 @@
 
             <nav class="hidden lg:flex space-x-8 text-lg font-medium">
                 <a href="#inicio" class="hover:text-purple-600 transition duration-300">Inicio</a>
-                <a href="#servicios" class="hover:text-purple-600 transition duration-300">Servicios</a>
+                <a href="{{ route('public.servicios') }}" class="hover:text-purple-600 transition duration-300">Servicios</a>
                 <a href="#nosotros" class="hover:text-purple-600 transition duration-300">Nosotros</a>
                 <a href="#contacto" class="hover:text-purple-600 transition duration-300">Contacto</a>
             </nav>
 
             <div class="flex items-center space-x-4">
-                <a href="#cotizador" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-indigo-700 transition duration-300 font-medium">
+                <a href="{{ route('public.carrito') }}" class="text-purple-600 hover:text-purple-800 relative mr-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 1.5M7 13l-1.5-1.5M17 21a2 2 0 100-4 2 2 0 000 4zM9 21a2 2 0 100-4 2 2 0 000 4z"></path>
+                    </svg>
+                    <span id="carrito-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+                <a href="{{ route('public.cotizar') }}" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-indigo-700 transition duration-300 font-medium">
                     Cotizar Ahora
                 </a>
                 <!-- Botón de menú móvil -->
@@ -116,34 +122,77 @@
             </p>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105">
-                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                    <span class="text-2xl">🏠</span>
+        <!-- Categorías dinámicas desde admin -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            @forelse($categorias as $categoria)
+                <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
+                        <span class="text-2xl">🎨</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">{{ $categoria->nombre }}</h3>
+                    <p class="text-gray-600 mb-6">{{ Str::limit($categoria->descripcion, 100) }}</p>
+                    <div class="flex justify-between items-center">
+                        <div class="text-purple-600 font-semibold">{{ $categoria->servicios->count() }} servicios</div>
+                        <a href="{{ route('public.servicios', ['categoria' => $categoria->id]) }}"
+                           class="bg-purple-600 text-white px-4 py-2 rounded-full text-sm hover:bg-purple-700 transition">
+                            Ver servicios
+                        </a>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-bold mb-4">Decoración Interior</h3>
-                <p class="text-gray-600 mb-6">Transforma cada rincón de tu hogar con nuestro servicio de decoración personalizada.</p>
-                <div class="text-purple-600 font-semibold">Cotización inmediata</div>
+            @empty
+                <div class="col-span-full text-center py-12">
+                    <div class="text-gray-400 text-6xl mb-4">🎨</div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay categorías disponibles</h3>
+                    <p class="text-gray-500">Las categorías aparecerán aquí cuando se creen desde el panel administrativo.</p>
+                </div>
+            @endforelse
+        </div>
+
+        <!-- Servicios destacados -->
+        @if($serviciosDestacados->count() > 0)
+        <div class="mt-16">
+            <h3 class="text-3xl font-bold text-center mb-12">Servicios Destacados</h3>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($serviciosDestacados as $servicio)
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition duration-300">
+                        @if($servicio->imagen)
+                            <img src="{{ asset('storage/' . $servicio->imagen) }}" alt="{{ $servicio->nombre }}" class="w-full h-48 object-cover rounded-lg mb-4">
+                        @else
+                            <div class="w-full h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center">
+                                <span class="text-4xl text-gray-400">🎨</span>
+                            </div>
+                        @endif
+
+                        <div class="mb-2">
+                            <span class="text-sm text-purple-600 font-medium">{{ $servicio->categoria->nombre ?? 'Sin categoría' }}</span>
+                        </div>
+
+                        <h4 class="text-xl font-bold mb-2">{{ $servicio->nombre }}</h4>
+                        <p class="text-gray-600 mb-4">{{ Str::limit($servicio->descripcion, 80) }}</p>
+
+                        <div class="flex justify-between items-center">
+                            <div class="text-2xl font-bold text-green-600">Q{{ number_format($servicio->precio, 2) }}</div>
+                            <div class="space-x-2">
+                                <a href="{{ route('public.servicio.detalle', $servicio->id) }}"
+                                   class="text-purple-600 hover:text-purple-800 font-medium">Ver detalles</a>
+                                <button onclick="agregarAlCarrito({{ $servicio->id }})"
+                                        class="bg-purple-600 text-white px-4 py-2 rounded-full text-sm hover:bg-purple-700 transition">
+                                    + Carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
-            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105">
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                    <span class="text-2xl">🎨</span>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Diseño Personalizado</h3>
-                <p class="text-gray-600 mb-6">Creamos espacios únicos que reflejan tu personalidad y estilo de vida.</p>
-                <div class="text-blue-600 font-semibold">Desde tu idea</div>
-            </div>
-
-            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition duration-300 transform hover:scale-105">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                    <span class="text-2xl">⚡</span>
-                </div>
-                <h3 class="text-2xl font-bold mb-4">Cotización Express</h3>
-                <p class="text-gray-600 mb-6">Obtén precios precisos al instante con nuestro sistema automatizado.</p>
-                <div class="text-green-600 font-semibold">En segundos</div>
+            <div class="text-center mt-8">
+                <a href="{{ route('public.servicios') }}"
+                   class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition duration-300">
+                    Ver Todos los Servicios
+                </a>
             </div>
         </div>
+        @endif
     </div>
 </section>
 
@@ -234,7 +283,7 @@
     </div>
 </footer>
 
-<!-- JavaScript para scroll suave -->
+<!-- JavaScript para scroll suave y carrito -->
 <script>
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -247,6 +296,75 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+// Funcionalidad del carrito
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+function agregarAlCarrito(servicioId) {
+    // Buscar el servicio en los datos de la página
+    const servicioData = @json($serviciosDestacados ?? []);
+    const servicio = servicioData.find(s => s.id == servicioId);
+
+    if (servicio) {
+        const existeEnCarrito = carrito.find(item => item.id == servicioId);
+
+        if (existeEnCarrito) {
+            existeEnCarrito.cantidad += 1;
+        } else {
+            carrito.push({
+                id: servicio.id,
+                nombre: servicio.nombre,
+                precio: servicio.precio,
+                categoria: servicio.categoria?.nombre || 'Sin categoría',
+                cantidad: 1
+            });
+        }
+
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        actualizarContadorCarrito();
+
+        // Mostrar notificación
+        mostrarNotificacion('Servicio agregado al carrito', 'success');
+    }
+}
+
+function actualizarContadorCarrito() {
+    const contador = document.getElementById('carrito-count');
+    const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+
+    if (totalItems > 0) {
+        contador.textContent = totalItems;
+        contador.classList.remove('hidden');
+    } else {
+        contador.classList.add('hidden');
+    }
+}
+
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const notificacion = document.createElement('div');
+    notificacion.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white ${tipo === 'success' ? 'bg-green-500' : 'bg-blue-500'} transform translate-x-full transition-transform duration-300`;
+    notificacion.textContent = mensaje;
+
+    document.body.appendChild(notificacion);
+
+    // Animar entrada
+    setTimeout(() => {
+        notificacion.classList.remove('translate-x-full');
+    }, 100);
+
+    // Remover después de 3 segundos
+    setTimeout(() => {
+        notificacion.classList.add('translate-x-full');
+        setTimeout(() => {
+            document.body.removeChild(notificacion);
+        }, 300);
+    }, 3000);
+}
+
+// Inicializar contador al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarContadorCarrito();
 });
 </script>
 

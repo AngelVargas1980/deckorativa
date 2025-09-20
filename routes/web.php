@@ -15,6 +15,8 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\CotizacionController;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\PublicController;
 
 /*
 |--------------------------------------------------------------------------|
@@ -22,9 +24,14 @@ use App\Http\Controllers\CotizacionController;
 |--------------------------------------------------------------------------|
 */
 
-Route::get('/', function () {
-    return view('public.inicio');
-});
+// Rutas públicas
+Route::get('/', [PublicController::class, 'index'])->name('public.home');
+Route::get('/servicios-publicos', [PublicController::class, 'servicios'])->name('public.servicios');
+Route::get('/servicio-detalle/{id}', [PublicController::class, 'servicioDetalle'])->name('public.servicio.detalle');
+Route::get('/carrito', [PublicController::class, 'carrito'])->name('public.carrito');
+Route::get('/cotizar', [PublicController::class, 'cotizar'])->name('public.cotizar');
+Route::post('/cotizar/pdf', [PublicController::class, 'generarPDFCotizacion'])->name('public.cotizar.pdf');
+Route::post('/cotizar/enviar', [PublicController::class, 'enviarCotizacion'])->name('public.cotizar.enviar');
 
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth'])
@@ -91,6 +98,10 @@ Route::middleware(['auth'])->group(function () {
 // Rutas para el controlador Producto
     Route::resource('productos', ProductoController::class);
 
+    // Rutas para HU9: Módulo de Pedidos
+    Route::resource('pedidos', PedidoController::class)->middleware('permission:view pedidos');
+    Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'cambiarEstado'])->name('pedidos.cambiarEstado')->middleware('permission:change state pedidos');
+    Route::get('/pedidos/{pedido}/pdf', [PedidoController::class, 'generarPDF'])->name('pedidos.pdf')->middleware('permission:generate pdf pedidos');
 
 });
 

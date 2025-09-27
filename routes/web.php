@@ -33,6 +33,16 @@ Route::get('/cotizar', [PublicController::class, 'cotizar'])->name('public.cotiz
 Route::post('/cotizar/pdf', [PublicController::class, 'generarPDFCotizacion'])->name('public.cotizar.pdf');
 Route::post('/cotizar/enviar', [PublicController::class, 'enviarCotizacion'])->name('public.cotizar.enviar');
 
+// Rutas de pagos públicos
+Route::post('/payment/process-cart', [App\Http\Controllers\PaymentController::class, 'procesarCarrito'])->name('public.payment.process');
+Route::get('/payment/success', [App\Http\Controllers\PaymentController::class, 'success'])->name('public.payment.success');
+Route::get('/payment/cancel', [App\Http\Controllers\PaymentController::class, 'cancel'])->name('public.payment.cancel');
+Route::post('/payment/webhook', [App\Http\Controllers\PaymentController::class, 'webhook'])->name('public.payment.webhook');
+Route::get('/payment/status/{pago}', [App\Http\Controllers\PaymentController::class, 'verificarEstado'])->name('public.payment.status');
+
+// Ruta de prueba para conexión con Recurrente
+Route::get('/payment/test-connection', [App\Http\Controllers\PaymentController::class, 'probarConexion'])->name('public.payment.test');
+
 Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware(['auth'])
     ->name('dashboard');

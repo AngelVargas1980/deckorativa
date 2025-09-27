@@ -206,7 +206,6 @@
         }
 
         function recalcular() {
-            console.log('Recalculando totales...');
         }
 
         function agregarServicio() {

@@ -321,7 +321,6 @@ async function enviarCotizacion(datos) {
         }
 
     } catch (error) {
-        console.error('Error:', error);
         mostrarNotificacion('Error de conexión. Por favor intenta nuevamente.', 'error');
     }
 }

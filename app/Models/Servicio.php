@@ -61,4 +61,29 @@ class Servicio extends Model
     {
         return 'Q' . number_format($this->precio, 2);
     }
+
+    public function getPrecioConUnidadAttribute()
+    {
+        $precio = 'Q' . number_format($this->precio, 2);
+
+        if ($this->unidad_medida) {
+            return $precio . ' / ' . $this->unidad_medida;
+        }
+
+        return $precio;
+    }
+
+    public function getUnidadMedidaFormateadaAttribute()
+    {
+        // Formatear unidades especiales
+        $unidades = [
+            'metro2' => 'metro²',
+            'm2' => 'm²',
+            'metro²' => 'metro²',
+            'm²' => 'm²'
+        ];
+
+        $unidad = $this->unidad_medida ?? '';
+        return $unidades[$unidad] ?? $unidad;
+    }
 }

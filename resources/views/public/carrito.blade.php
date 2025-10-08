@@ -584,9 +584,10 @@ function procesarPago(event) {
     .then(data => {
 
         if (data.success && data.checkout_url) {
-            // Limpiar carrito local antes de redireccionar
-            carrito = [];
-            guardarCarrito();
+            // IMPORTANTE: NO borrar el carrito aquí
+            // Solo se borrará cuando el pago sea exitoso en la página de success
+            // Guardar una copia en sessionStorage como respaldo
+            sessionStorage.setItem('carritoEnProceso', JSON.stringify(carrito));
 
             // Mostrar mensaje de éxito antes de redirigir
             mostrarNotificacion('✅ Redirigiendo a página de pago...', 'success');

@@ -99,5 +99,21 @@
             </p>
         </div>
     </div>
+
+    <script>
+        // IMPORTANTE: Limpiar el sessionStorage de respaldo
+        // El carrito en localStorage NO se borra, por lo que el usuario
+        // puede regresar al carrito y ver sus items intactos
+        sessionStorage.removeItem('carritoEnProceso');
+
+        // Verificar que el carrito existe
+        const carrito = localStorage.getItem('carrito');
+        if (carrito) {
+            const items = JSON.parse(carrito);
+            console.log('✅ Tu carrito está intacto con', items.length, 'items');
+        } else {
+            console.log('ℹ️ El carrito está vacío');
+        }
+    </script>
 </body>
 </html>

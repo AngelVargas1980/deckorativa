@@ -133,6 +133,11 @@
 
     <!-- JavaScript para verificación automática -->
     <script>
+        // IMPORTANTE: Mientras el pago está pendiente, NO borrar el carrito
+        // Solo se limpia el sessionStorage de respaldo
+        sessionStorage.removeItem('carritoEnProceso');
+        console.log('⏳ Pago pendiente - El carrito se mantendrá hasta confirmar el pago');
+
         let verificacionInterval;
         const pagoId = {{ $pago->id }};
 

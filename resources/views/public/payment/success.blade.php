@@ -103,6 +103,13 @@
 
     <!-- Auto-redirección opcional -->
     <script>
+        // IMPORTANTE: Limpiar el carrito cuando el pago es exitoso
+        // Solo aquí se debe borrar el carrito, no antes
+        localStorage.removeItem('carrito');
+        sessionStorage.removeItem('carritoEnProceso');
+
+        console.log('✅ Pago exitoso - Carrito limpiado');
+
         // Opcional: Auto-redirección después de 30 segundos
         // setTimeout(() => {
         //     window.location.href = "{{ route('public.home') }}";

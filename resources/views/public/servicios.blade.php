@@ -58,9 +58,17 @@
 
 <section class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-16">
     <div class="max-w-7xl mx-auto px-6 text-center">
-        <h1 class="text-4xl lg:text-6xl font-bold mb-6">Nuestros Servicios</h1>
+        <h1 class="text-4xl lg:text-6xl font-bold mb-6">
+            @if(request('tipo') == 'producto')
+                Nuestros Productos
+            @elseif(request('tipo') == 'servicio')
+                Nuestros Servicios
+            @else
+                Servicios y Productos
+            @endif
+        </h1>
         <p class="text-xl lg:text-2xl opacity-90 max-w-3xl mx-auto">
-            Descubre todos nuestros servicios de decoración y agrega los que necesitas a tu carrito para obtener una cotización personalizada.
+            Descubre todos nuestros servicios y productos de decoración y agrega los que necesitas a tu carrito para obtener una cotización personalizada.
         </p>
     </div>
 </section>
@@ -76,6 +84,15 @@
                     <input type="text" name="search" value="{{ request('search') }}"
                            placeholder="Buscar por nombre..."
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                    <select name="tipo" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="">Todos</option>
+                        <option value="servicio" {{ request('tipo') == 'servicio' ? 'selected' : '' }}>Servicios</option>
+                        <option value="producto" {{ request('tipo') == 'producto' ? 'selected' : '' }}>Productos</option>
+                    </select>
                 </div>
 
                 <div>
@@ -119,16 +136,26 @@
         @if($servicios->count() > 0)
             <div class="mb-6">
                 <h3 class="text-2xl font-bold text-gray-900">
-                    {{ $servicios->total() }} servicios encontrados
+                    {{ $servicios->total() }}
+                    @if(request('tipo') == 'producto')
+                        productos encontrados
+                    @elseif(request('tipo') == 'servicio')
+                        servicios encontrados
+                    @else
+                        resultados encontrados
+                    @endif
                 </h3>
-                @if(request()->hasAny(['search', 'categoria', 'precio_min', 'precio_max']))
+                @if(request()->hasAny(['search', 'categoria', 'tipo', 'precio_min', 'precio_max']))
                     <p class="text-gray-600 mt-1">
                         Resultados filtrados
                         @if(request('search'))
                             por "<strong>{{ request('search') }}</strong>"
                         @endif
+                        @if(request('tipo'))
+                            - Tipo: <strong>{{ ucfirst(request('tipo')) }}</strong>
+                        @endif
                         @if(request('categoria'))
-                            en "{{ $categorias->find(request('categoria'))->nombre ?? 'Categoría' }}"
+                            - Categoría: <strong>{{ $categorias->find(request('categoria'))->nombre ?? 'Categoría' }}</strong>
                         @endif
                     </p>
                 @endif
@@ -147,15 +174,23 @@
                         @endif
 
                         <div class="p-6">
-                            <div class="mb-2">
-                                <span class="text-sm text-purple-600 font-medium">{{ $servicio->categoria->nombre ?? 'Sin categoría' }}</span>
+                            <div class="mb-2 flex gap-2">
+                                <span class="text-xs {{ $servicio->tipo == 'producto' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600' }} px-3 py-1 rounded-full font-medium">
+                                    {{ ucfirst($servicio->tipo) }}
+                                </span>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-medium">{{ $servicio->categoria->nombre ?? 'Sin categoría' }}</span>
                             </div>
 
                             <h4 class="text-xl font-bold mb-2 text-gray-900">{{ $servicio->nombre }}</h4>
                             <p class="text-gray-600 mb-4 text-sm">{{ Str::limit($servicio->descripcion, 100) }}</p>
 
                             <div class="flex justify-between items-center">
-                                <div class="text-2xl font-bold text-green-600">Q{{ number_format($servicio->precio, 2) }}</div>
+                                <div>
+                                    <div class="text-2xl font-bold text-green-600">Q{{ number_format($servicio->precio, 2) }}</div>
+                                    @if($servicio->unidad_medida)
+                                        <div class="text-xs text-gray-500 mt-1">por {{ $servicio->unidad_medida_formateada }}</div>
+                                    @endif
+                                </div>
                                 <div class="space-x-2">
                                     <a href="{{ route('public.servicio.detalle', $servicio->id) }}"
                                        class="text-purple-600 hover:text-purple-800 font-medium text-sm">Ver detalles</a>

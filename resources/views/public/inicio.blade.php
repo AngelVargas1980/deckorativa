@@ -163,15 +163,23 @@
                             </div>
                         @endif
 
-                        <div class="mb-2">
-                            <span class="text-sm text-purple-600 font-medium">{{ $servicio->categoria->nombre ?? 'Sin categoría' }}</span>
+                        <div class="mb-2 flex gap-2">
+                            <span class="text-xs {{ $servicio->tipo == 'producto' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600' }} px-3 py-1 rounded-full font-medium">
+                                {{ ucfirst($servicio->tipo) }}
+                            </span>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full font-medium">{{ $servicio->categoria->nombre ?? 'Sin categoría' }}</span>
                         </div>
 
                         <h4 class="text-xl font-bold mb-2">{{ $servicio->nombre }}</h4>
                         <p class="text-gray-600 mb-4">{{ Str::limit($servicio->descripcion, 80) }}</p>
 
                         <div class="flex justify-between items-center">
-                            <div class="text-2xl font-bold text-green-600">Q{{ number_format($servicio->precio, 2) }}</div>
+                            <div>
+                                <div class="text-2xl font-bold text-green-600">Q{{ number_format($servicio->precio, 2) }}</div>
+                                @if($servicio->unidad_medida)
+                                    <div class="text-xs text-gray-500 mt-1">por {{ $servicio->unidad_medida_formateada }}</div>
+                                @endif
+                            </div>
                             <div class="space-x-2">
                                 <a href="{{ route('public.servicio.detalle', $servicio->id) }}"
                                    class="text-purple-600 hover:text-purple-800 font-medium">Ver detalles</a>
@@ -224,7 +232,7 @@
                     <span class="text-lg">Recibe tu cotización instantánea</span>
                 </div>
             </div>
-            <a href="#" class="inline-block mt-8 bg-yellow-400 text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-yellow-300 transition duration-300 transform hover:scale-105">
+            <a href="{{ route('public.cotizar') }}" class="inline-block mt-8 bg-yellow-400 text-gray-900 px-8 py-4 rounded-full text-lg font-semibold hover:bg-yellow-300 transition duration-300 transform hover:scale-105">
                 Comenzar Ahora
             </a>
         </div>

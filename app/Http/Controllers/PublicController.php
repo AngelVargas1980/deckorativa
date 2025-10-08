@@ -23,6 +23,11 @@ class PublicController extends Controller
     {
         $query = Servicio::with('categoria');
 
+        // Filtrar por tipo
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
         // Filtrar por categoría
         if ($request->filled('categoria')) {
             $query->where('categoria_id', $request->categoria);
@@ -125,18 +130,17 @@ class PublicController extends Controller
         ];
 
         try {
-            // Enviar correo al admin
+            // Enviar correo al equipo de ventas
             Mail::send('emails.nueva-cotizacion', $datos, function($message) use ($datos) {
-                $message->to('admin@deckorativa.com', 'Admin Deckorativa')
+                $message->to('ventas.deckorativa@gmail.com', 'Ventas Deckorativa')
                         ->subject('Nueva Solicitud de Cotización - ' . $datos['numero_cotizacion'])
-                        ->from($datos['email'], $datos['nombre']);
+                        ->replyTo($datos['email'], $datos['nombre']);
             });
 
             // Enviar confirmación al cliente
             Mail::send('emails.confirmacion-cotizacion', $datos, function($message) use ($datos) {
                 $message->to($datos['email'], $datos['nombre'])
-                        ->subject('Confirmación de Solicitud de Cotización - DECKORATIVA')
-                        ->from('info@deckorativa.com', 'DECKORATIVA');
+                        ->subject('Confirmación de Solicitud de Cotización - DECKORATIVA');
             });
 
             return response()->json([
@@ -145,9 +149,15 @@ class PublicController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error al enviar cotización por email', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error al enviar la solicitud. Por favor intenta nuevamente.'
+                'message' => 'Error al enviar la solicitud. Por favor intenta nuevamente.',
+                'error_detail' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }

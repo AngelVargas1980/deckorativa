@@ -15,6 +15,10 @@
                     </p>
                 </div>
                 <div class="mt-6 lg:mt-0 flex flex-col sm:flex-row gap-3">
+                    <button onclick="window.print()" class="btn-outline">
+                        <i class="fas fa-print mr-2"></i>
+                        Imprimir
+                    </button>
                     @can('edit categorias')
                     <a href="{{ route('categorias.edit', $categoria) }}" class="btn-primary">
                         <i class="fas fa-edit mr-2"></i>
@@ -181,4 +185,17 @@
         </div>
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        @media print {
+            .page-header .flex {
+                flex-direction: column;
+            }
+            .btn-primary, .btn-outline {
+                display: none !important;
+            }
+        }
+    </style>
+    @endpush
 @endsection

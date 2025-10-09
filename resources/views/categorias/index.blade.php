@@ -170,14 +170,14 @@
                                 <td>
                                     <div class="flex items-center">
                                         @if($categoria->imagen)
-                                            <div class="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden shadow-md mr-4">
-                                                <img src="{{ asset('storage/' . $categoria->imagen) }}" 
-                                                     alt="{{ $categoria->nombre }}" 
+                                            <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden shadow-md mr-4">
+                                                <img src="{{ asset('storage/' . $categoria->imagen) }}"
+                                                     alt="{{ $categoria->nombre }}"
                                                      class="w-full h-full object-cover">
                                             </div>
                                         @else
-                                            <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md mr-4">
-                                                <span class="text-white font-bold text-sm">
+                                            <div class="w-20 h-20 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md mr-4">
+                                                <span class="text-white font-bold text-lg">
                                                     {{ strtoupper(substr($categoria->nombre, 0, 2)) }}
                                                 </span>
                                             </div>
@@ -238,11 +238,10 @@
                                         @endcan
 
                                         @can('delete categorias')
-                                        <form action="{{ route('categorias.destroy', $categoria) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta categoría?\n\nEsta acción no se puede deshacer.');">
+                                        <form action="{{ route('categorias.destroy', $categoria) }}" method="POST" class="inline" id="form-delete-{{ $categoria->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
+                                            <button type="button" onclick="confirmarEliminacion({{ $categoria->id }}, '{{ $categoria->nombre }}')"
                                                     class="inline-flex items-center justify-center w-8 h-8 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                                                     title="Eliminar">
                                                 <i class="fas fa-trash text-sm"></i>
@@ -297,8 +296,61 @@
         </div>
     </div>
 
+    <!-- Modal de confirmación para eliminar -->
+    <div id="modal-confirmar-eliminar" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                <div class="px-6 py-4 bg-red-600">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3"></i>
+                        Confirmar Eliminación
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">
+                        ¿Estás seguro de que deseas eliminar la categoría <strong id="categoria-nombre"></strong>?
+                    </p>
+                    <p class="text-sm text-gray-500 bg-yellow-50 border border-yellow-200 rounded p-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Esta acción no se puede deshacer.
+                    </p>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+                    <button type="button" onclick="cerrarModalEliminar()"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="confirmarYEliminar()"
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        <i class="fas fa-trash mr-2"></i>
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
         <script>
+            let categoriaIdParaEliminar = null;
+
+            function confirmarEliminacion(id, nombre) {
+                categoriaIdParaEliminar = id;
+                document.getElementById('categoria-nombre').textContent = nombre;
+                document.getElementById('modal-confirmar-eliminar').classList.remove('hidden');
+            }
+
+            function cerrarModalEliminar() {
+                categoriaIdParaEliminar = null;
+                document.getElementById('modal-confirmar-eliminar').classList.add('hidden');
+            }
+
+            function confirmarYEliminar() {
+                if (categoriaIdParaEliminar) {
+                    document.getElementById('form-delete-' + categoriaIdParaEliminar).submit();
+                }
+            }
+
             $(document).ready(function() {
                 // Verificar si la tabla tiene datos antes de inicializar DataTables
                 var hasData = $('#tablaCategorias tbody tr').length > 0 &&
@@ -333,6 +385,11 @@
                             zeroRecords: "No se encontraron categorías",
                             buttons: {
                                 copy: "Copiar",
+                                copyTitle: "Copiado al portapapeles",
+                                copySuccess: {
+                                    _: "%d filas copiadas",
+                                    1: "1 fila copiada"
+                                },
                                 excel: "Excel",
                                 pdf: "PDF"
                             }

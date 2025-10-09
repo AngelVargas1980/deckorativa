@@ -15,7 +15,39 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+
+        /* Estilos globales de impresión */
+        @media print {
+            /* Ocultar navegación y elementos de UI */
+            nav,
+            .navbar,
+            header,
+            aside,
+            .sidebar,
+            .no-print {
+                display: none !important;
+            }
+
+            /* Optimizar para impresión */
+            body {
+                margin: 0;
+                padding: 0;
+                background: white !important;
+            }
+
+            main {
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+
+            /* Evitar saltos de página innecesarios */
+            .card,
+            .table-container {
+                page-break-inside: avoid;
+            }
+        }
     </style>
+    @stack('styles')
 </head>
 <body class="font-sans antialiased bg-gray-50">
     <div class="min-h-screen">

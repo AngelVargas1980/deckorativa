@@ -160,7 +160,7 @@
             <!-- Vista de Tarjetas (Grid) -->
             @if($servicios->count() > 0)
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         @foreach($servicios as $servicio)
                             <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                                 <!-- Imagen del servicio/producto -->
@@ -242,11 +242,11 @@
                                         @endcan
 
                                         @can('delete servicios')
-                                        <form action="{{ route('servicios.destroy', $servicio) }}" method="POST" class="inline">
+                                        <form action="{{ route('servicios.destroy', $servicio) }}" method="POST" class="inline" id="form-delete-{{ $servicio->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    onclick="return confirm('¿Estás seguro de eliminar este {{ $servicio->tipo }}?')"
+                                            <button type="button"
+                                                    onclick="confirmarEliminacion({{ $servicio->id }}, '{{ $servicio->nombre }}', '{{ $servicio->tipo }}')"
                                                     class="inline-flex items-center justify-center w-10 h-10 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -293,10 +293,96 @@
         </div>
     </div>
 
+    <!-- Modal de confirmación para eliminar -->
+    <div id="modal-confirmar-eliminar" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                <div class="px-6 py-4 bg-red-600">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3"></i>
+                        Confirmar Eliminación
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">
+                        ¿Estás seguro de que deseas eliminar <span id="servicio-tipo">el servicio</span> <strong id="servicio-nombre"></strong>?
+                    </p>
+                    <p class="text-sm text-gray-500 bg-yellow-50 border border-yellow-200 rounded p-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Esta acción no se puede deshacer.
+                    </p>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+                    <button type="button" onclick="cerrarModalEliminar()"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="confirmarYEliminar()"
+                            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        <i class="fas fa-trash mr-2"></i>
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
         <script>
+            let servicioIdParaEliminar = null;
+
+            function confirmarEliminacion(id, nombre, tipo) {
+                servicioIdParaEliminar = id;
+                document.getElementById('servicio-nombre').textContent = nombre;
+                document.getElementById('servicio-tipo').textContent = tipo === 'servicio' ? 'el servicio' : 'el producto';
+                document.getElementById('modal-confirmar-eliminar').classList.remove('hidden');
+            }
+
+            function cerrarModalEliminar() {
+                servicioIdParaEliminar = null;
+                document.getElementById('modal-confirmar-eliminar').classList.add('hidden');
+            }
+
+            function confirmarYEliminar() {
+                if (servicioIdParaEliminar) {
+                    document.getElementById('form-delete-' + servicioIdParaEliminar).submit();
+                }
+            }
+
             function exportServicios() {
-                alert('Función de exportación en desarrollo');
+                // Crear el contenido CSV
+                let csv = 'ID,Nombre,Tipo,Categoría,Precio,Unidad Medida,Tiempo Estimado,Estado,Fecha Creación\n';
+
+                // Obtener todos los servicios de la página actual
+                const servicios = @json($servicios->items());
+
+                servicios.forEach(servicio => {
+                    const row = [
+                        servicio.id,
+                        `"${servicio.nombre}"`,
+                        servicio.tipo,
+                        `"${servicio.categoria?.nombre || 'Sin categoría'}"`,
+                        servicio.precio,
+                        servicio.unidad_medida,
+                        servicio.tiempo_estimado || 'N/A',
+                        servicio.activo ? 'Activo' : 'Inactivo',
+                        new Date(servicio.created_at).toLocaleDateString('es-GT')
+                    ];
+                    csv += row.join(',') + '\n';
+                });
+
+                // Crear el archivo y descargarlo
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                const fecha = new Date().toISOString().split('T')[0];
+
+                link.setAttribute('href', url);
+                link.setAttribute('download', `catalogo_servicios_${fecha}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         </script>
     @endpush

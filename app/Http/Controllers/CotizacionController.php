@@ -209,21 +209,43 @@ class CotizacionController extends Controller
 
     public function generarPDF(Cotizacion $cotizacion)
     {
-        // TODO: barryvdh/laravel-dompdf para funcionalidad de PDF
-        return redirect()->back()
-                        ->with('error', 'Función de PDF temporalmente deshabilitada. Contacte al administrador.');
+        $cotizacion->load(['client', 'user', 'detalles.servicio.categoria']);
+
+        return view('cotizaciones.pdf', compact('cotizacion'))->with([
+            'printMode' => true,
+            'filename' => 'cotizacion-' . $cotizacion->numero_cotizacion . '.pdf'
+        ]);
     }
 
     public function enviarEmail(Cotizacion $cotizacion)
     {
-        // Implementar envío de email
-        $cotizacion->update([
-            'enviada_cliente' => true,
-            'fecha_envio' => now(),
-            'estado' => 'enviada'
-        ]);
+        try {
+            $cotizacion->load(['client', 'detalles.servicio.categoria', 'user']);
 
-        return redirect()->back()
-                        ->with('success', 'Cotización enviada por email exitosamente.');
+            // Enviar correo al cliente
+            Mail::send('emails.cotizacion-cliente', ['cotizacion' => $cotizacion], function($message) use ($cotizacion) {
+                $message->to($cotizacion->client->email, $cotizacion->client->nombre_completo)
+                        ->subject('Cotización ' . $cotizacion->numero_cotizacion . ' - DECKORATIVA');
+            });
+
+            // Actualizar estado de la cotizacion
+            $cotizacion->update([
+                'enviada_cliente' => true,
+                'fecha_envio' => now(),
+                'estado' => 'enviada'
+            ]);
+
+            return redirect()->back()
+                            ->with('success', 'Cotización enviada por email exitosamente a ' . $cotizacion->client->email);
+
+        } catch (\Exception $e) {
+            \Log::error('Error al enviar cotización por email', [
+                'cotizacion_id' => $cotizacion->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->back()
+                            ->with('error', 'Error al enviar el correo: ' . $e->getMessage());
+        }
     }
 }

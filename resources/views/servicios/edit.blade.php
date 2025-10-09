@@ -140,18 +140,32 @@
                             Imagen
                         </h3>
 
-                        @if($servicio->imagen)
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagen Actual</label>
-                            <img src="{{ asset('storage/' . $servicio->imagen) }}" 
-                                 alt="{{ $servicio->nombre }}" 
-                                 class="h-32 w-32 object-cover rounded-lg shadow-md">
-                        </div>
-                        @endif
-
                         <div>
                             <label class="form-label">{{ $servicio->imagen ? 'Cambiar Imagen' : 'Agregar Imagen' }} (opcional)</label>
-                            <input type="file" name="imagen" accept="image/*" class="form-input">
+                            <div id="drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                                <div class="space-y-1 text-center">
+                                    <div id="preview-container" class="{{ $servicio->imagen ? '' : 'hidden' }}">
+                                        <img id="image-preview"
+                                             src="{{ $servicio->imagen ? asset('storage/' . $servicio->imagen) : '' }}"
+                                             class="mx-auto h-32 w-32 object-cover rounded-lg shadow-md">
+                                        <button type="button" onclick="removeImage()" class="mt-2 text-red-600 hover:text-red-800 text-sm">
+                                            <i class="fas fa-times mr-1"></i>
+                                            Remover imagen
+                                        </button>
+                                    </div>
+                                    <div id="upload-placeholder" class="{{ $servicio->imagen ? 'hidden' : '' }}">
+                                        <i class="fas fa-image text-4xl text-gray-400 mb-4"></i>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                                <span>Subir una imagen</span>
+                                                <input id="imagen" name="imagen" type="file" accept="image/*" class="sr-only" onchange="previewImage(event)">
+                                            </label>
+                                            <p class="pl-1">o arrastra y suelta</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG, GIF hasta 2MB</p>
+                                    </div>
+                                </div>
+                            </div>
                             @error('imagen')
                                 <p class="form-error">{{ $message }}</p>
                             @enderror
@@ -173,4 +187,64 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('preview-container').classList.remove('hidden');
+                    document.getElementById('upload-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            document.getElementById('imagen').value = '';
+            document.getElementById('preview-container').classList.add('hidden');
+            document.getElementById('upload-placeholder').classList.remove('hidden');
+        }
+
+        // Drag & Drop functionality
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('imagen');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                fileInput.files = files;
+                previewImage({ target: { files: files } });
+            }
+        }
+    </script>
+    @endpush
 @endsection

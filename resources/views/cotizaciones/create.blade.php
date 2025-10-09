@@ -39,7 +39,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="form-label required">Cliente</label>
-                                <select name="client_id" class="form-select @error('client_id') border-red-500 @enderror" required>
+                                <select name="client_id" id="select-cliente" class="form-select @error('client_id') border-red-500 @enderror" required>
                                     <option value="">Seleccionar cliente</option>
                                     @foreach($clientes as $cliente)
                                         <option value="{{ $cliente->id }}" {{ old('client_id') == $cliente->id ? 'selected' : '' }}>
@@ -116,14 +116,15 @@
                             </div>
                         </div>
 
-                        <!-- Lista de servicios seleccionados -->
-                        <div id="servicios-seleccionados">
-                            <div class="text-center py-8 text-gray-500" id="no-servicios">
-                                <i class="fas fa-layer-group text-3xl mb-2"></i>
-                                <p>No has agregado servicios o productos aún</p>
-                                <p class="text-sm">Haz clic en "Agregar Item" para comenzar</p>
-                            </div>
+                        <!-- Mensaje cuando no hay servicios -->
+                        <div class="text-center py-8 text-gray-500" id="no-servicios">
+                            <i class="fas fa-layer-group text-3xl mb-2"></i>
+                            <p>No has agregado servicios o productos aún</p>
+                            <p class="text-sm">Haz clic en "Agregar Item" para comenzar</p>
                         </div>
+
+                        <!-- Lista de servicios seleccionados -->
+                        <div id="servicios-seleccionados"></div>
                     </div>
                 </div>
 
@@ -183,17 +184,64 @@
         </form>
 
         <!-- Modal para agregar servicios -->
-        <div id="modal-servicios" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div id="modal-servicios" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50" onclick="event.target === this && cerrarModal()">
             <div class="flex items-center justify-center min-h-screen p-4">
-                <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-96 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold">Seleccionar Servicios/Productos</h3>
-                        <button type="button" onclick="cerrarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-times text-xl"></i>
+                <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+                    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-600 to-indigo-600">
+                        <h3 class="text-lg font-semibold text-white">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Seleccionar Servicios/Productos
+                        </h3>
+                        <button type="button" onclick="cerrarModal()" class="text-white hover:text-gray-200 transition">
+                            <i class="fas fa-times text-2xl"></i>
                         </button>
                     </div>
-                    <div class="p-6 overflow-y-auto max-h-80" id="lista-servicios">
+
+                    <!-- Filtros dentro del modal -->
+                    <div class="px-6 py-4 bg-gray-50 border-b">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                                <select id="filtro-categoria-modal" class="form-select" onchange="filtrarServiciosModal()">
+                                    <option value="">Todas las categorías</option>
+                                    @foreach($categorias as $categoria)
+                                        <option value="{{ $categoria->id }}">{{ $categoria->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                                <select id="filtro-tipo-modal" class="form-select" onchange="filtrarServiciosModal()">
+                                    <option value="">Todos</option>
+                                    <option value="servicio">Servicios</option>
+                                    <option value="producto">Productos</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+                                <input type="text" id="filtro-buscar-modal" class="form-input"
+                                       placeholder="Buscar por nombre..." onkeyup="filtrarServiciosModal()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 300px);" id="lista-servicios">
                         <!-- Los servicios se cargarán aquí via JavaScript -->
+                    </div>
+
+                    <!-- Paginación -->
+                    <div class="px-6 py-3 bg-gray-50 border-t border-b" id="paginacion-modal">
+                        <!-- La paginación se cargará aquí -->
+                    </div>
+                    <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <p class="text-sm text-gray-600">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Haz clic en los items para agregarlos. El modal no se cerrará automáticamente.
+                        </p>
+                        <button type="button" onclick="cerrarModal()" class="btn-primary">
+                            <i class="fas fa-check mr-2"></i>
+                            Cerrar y Continuar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -205,43 +253,162 @@
         let serviciosDisponibles = @json($categorias->load('servicios')->pluck('servicios')->flatten());
         let serviciosSeleccionados = [];
         let contadorServicios = 0;
+        let paginaActual = 1;
+        let itemsPorPagina = 12;
 
         function agregarServicio() {
             document.getElementById('modal-servicios').classList.remove('hidden');
+            paginaActual = 1;
             cargarServicios();
         }
 
-        function cargarServicios() {
-            let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-            serviciosDisponibles.forEach(servicio => {
-                if (servicio.activo) {
+        function filtrarServicios() {
+            const categoriaFiltro = document.getElementById('filtro-categoria').value;
+            const tipoFiltro = document.getElementById('filtro-tipo').value;
+            const busqueda = document.getElementById('filtro-buscar').value.toLowerCase();
+
+            let serviciosFiltrados = serviciosDisponibles.filter(servicio => {
+                let coincide = servicio.activo;
+
+                if (categoriaFiltro && servicio.categoria_id != categoriaFiltro) {
+                    coincide = false;
+                }
+
+                if (tipoFiltro && servicio.tipo != tipoFiltro) {
+                    coincide = false;
+                }
+
+                if (busqueda && !servicio.nombre.toLowerCase().includes(busqueda)) {
+                    coincide = false;
+                }
+
+                return coincide;
+            });
+
+            cargarServicios(serviciosFiltrados);
+        }
+
+        function filtrarServiciosModal() {
+            paginaActual = 1;
+            const categoriaFiltro = document.getElementById('filtro-categoria-modal').value;
+            const tipoFiltro = document.getElementById('filtro-tipo-modal').value;
+            const busqueda = document.getElementById('filtro-buscar-modal').value.toLowerCase();
+
+            let serviciosFiltrados = serviciosDisponibles.filter(servicio => {
+                let coincide = servicio.activo;
+
+                if (categoriaFiltro && servicio.categoria_id != categoriaFiltro) {
+                    coincide = false;
+                }
+
+                if (tipoFiltro && servicio.tipo != tipoFiltro) {
+                    coincide = false;
+                }
+
+                if (busqueda && !servicio.nombre.toLowerCase().includes(busqueda)) {
+                    coincide = false;
+                }
+
+                return coincide;
+            });
+
+            cargarServicios(serviciosFiltrados);
+        }
+
+        function cargarServicios(servicios = null) {
+            let listaServicios = servicios || serviciosDisponibles.filter(s => s.activo);
+
+            // Calcular paginación
+            const totalPaginas = Math.ceil(listaServicios.length / itemsPorPagina);
+            const inicio = (paginaActual - 1) * itemsPorPagina;
+            const fin = inicio + itemsPorPagina;
+            const serviciosPaginados = listaServicios.slice(inicio, fin);
+
+            let html = '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">';
+
+            if (serviciosPaginados.length === 0) {
+                html = '<div class="text-center py-8 text-gray-500"><i class="fas fa-search text-3xl mb-2"></i><p>No se encontraron servicios o productos</p></div>';
+            } else {
+                serviciosPaginados.forEach(servicio => {
+                    const imagen = servicio.imagen ? `/storage/${servicio.imagen}` : '';
                     html += `
-                        <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="seleccionarServicio(${servicio.id})">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900">${servicio.nombre}</h4>
-                                    <p class="text-sm text-gray-600">${servicio.categoria?.nombre || ''}</p>
-                                    <p class="text-lg font-bold text-green-600">Q${parseFloat(servicio.precio).toFixed(2)}</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${servicio.tipo == 'servicio' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
+                        <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-all cursor-pointer transform hover:scale-105" onclick="seleccionarServicio(${servicio.id})">
+                            <div class="h-32 bg-gray-100 flex items-center justify-center">
+                                ${imagen ? `<img src="${imagen}" alt="${servicio.nombre}" class="h-full w-full object-cover">` : '<i class="fas fa-image text-4xl text-gray-300"></i>'}
+                            </div>
+                            <div class="p-3">
+                                <div class="flex gap-1 mb-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${servicio.tipo == 'servicio' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
                                         ${servicio.tipo.charAt(0).toUpperCase() + servicio.tipo.slice(1)}
                                     </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
+                                        ${servicio.categoria?.nombre || 'Sin categoría'}
+                                    </span>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 text-sm mb-1">${servicio.nombre}</h4>
+                                <p class="text-sm text-gray-600 mb-2 line-clamp-2">${servicio.descripcion || ''}</p>
+                                <div class="flex justify-between items-center">
+                                    <p class="text-lg font-bold text-green-600">Q${parseFloat(servicio.precio).toFixed(2)}</p>
+                                    <button type="button" class="btn-primary btn-sm" onclick="event.stopPropagation(); seleccionarServicio(${servicio.id})">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     `;
-                }
-            });
+                });
+            }
+
             html += '</div>';
             document.getElementById('lista-servicios').innerHTML = html;
+
+            // Renderizar paginación
+            renderizarPaginacion(totalPaginas, listaServicios);
+        }
+
+        function renderizarPaginacion(totalPaginas, servicios) {
+            if (totalPaginas <= 1) {
+                document.getElementById('paginacion-modal').innerHTML = '';
+                return;
+            }
+
+            let html = '<div class="flex items-center justify-between">';
+            html += `<p class="text-sm text-gray-600">Mostrando ${servicios.length} servicios - Página ${paginaActual} de ${totalPaginas}</p>`;
+            html += '<div class="flex gap-2">';
+
+            // Botón anterior
+            if (paginaActual > 1) {
+                html += `<button type="button" onclick="cambiarPagina(${paginaActual - 1})" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"><i class="fas fa-chevron-left"></i></button>`;
+            }
+
+            // Páginas
+            for (let i = 1; i <= totalPaginas; i++) {
+                if (i === paginaActual) {
+                    html += `<button type="button" class="px-3 py-1 bg-purple-600 text-white rounded">${i}</button>`;
+                } else {
+                    html += `<button type="button" onclick="cambiarPagina(${i})" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded">${i}</button>`;
+                }
+            }
+
+            // Botón siguiente
+            if (paginaActual < totalPaginas) {
+                html += `<button type="button" onclick="cambiarPagina(${paginaActual + 1})" class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"><i class="fas fa-chevron-right"></i></button>`;
+            }
+
+            html += '</div></div>';
+            document.getElementById('paginacion-modal').innerHTML = html;
+        }
+
+        function cambiarPagina(pagina) {
+            paginaActual = pagina;
+            filtrarServiciosModal();
         }
 
         function seleccionarServicio(servicioId) {
             let servicio = serviciosDisponibles.find(s => s.id == servicioId);
             if (servicio) {
                 agregarServicioACotizacion(servicio);
-                cerrarModal();
+                // No cerramos el modal para permitir agregar múltiples items
             }
         }
 
@@ -258,6 +425,20 @@
 
             renderizarServicios();
             calcularTotales();
+
+            // Mostrar notificación
+            mostrarNotificacion(`✓ ${servicio.nombre} agregado`);
+        }
+
+        function mostrarNotificacion(mensaje) {
+            const notif = document.createElement('div');
+            notif.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+            notif.innerHTML = `<i class="fas fa-check-circle mr-2"></i>${mensaje}`;
+            document.body.appendChild(notif);
+
+            setTimeout(() => {
+                notif.remove();
+            }, 2000);
         }
 
         function renderizarServicios() {
@@ -266,6 +447,7 @@
 
             if (serviciosSeleccionados.length === 0) {
                 noServicios.style.display = 'block';
+                container.innerHTML = '';
                 return;
             }
 
@@ -274,21 +456,22 @@
             let html = '';
             serviciosSeleccionados.forEach((item, index) => {
                 html += `
-                    <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                    <div class="border border-gray-200 rounded-lg p-4 mb-4 relative" data-item-id="${item.id}">
                         <input type="hidden" name="servicios[${index}][servicio_id]" value="${item.servicio_id}">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1 pr-12">
                                 <h4 class="font-semibold text-gray-900">${item.servicio.nombre}</h4>
                                 <p class="text-sm text-gray-600">${item.servicio.categoria?.nombre || ''}</p>
                             </div>
-                            <button type="button" onclick="removerServicio(${item.id})" class="text-red-600 hover:text-red-800">
-                                <i class="fas fa-trash"></i>
+                            <button type="button" onclick="removerServicio(${item.id})"
+                                    class="w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all flex items-center justify-center shadow-lg">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <div class="grid grid-cols-3 gap-4 mt-4">
+                        <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm text-gray-600">Cantidad</label>
-                                <input type="number" name="servicios[${index}][cantidad]" value="${item.cantidad}" min="1" 
+                                <input type="number" name="servicios[${index}][cantidad]" value="${item.cantidad}" min="1"
                                        class="form-input" onchange="actualizarCantidad(${item.id}, this.value)">
                             </div>
                             <div>
@@ -322,7 +505,10 @@
         }
 
         function removerServicio(itemId) {
-            serviciosSeleccionados = serviciosSeleccionados.filter(s => s.id != itemId);
+            console.log('Removiendo servicio ID:', itemId);
+            console.log('Antes:', serviciosSeleccionados);
+            serviciosSeleccionados = serviciosSeleccionados.filter(s => s.id !== itemId);
+            console.log('Después:', serviciosSeleccionados);
             renderizarServicios();
             calcularTotales();
         }

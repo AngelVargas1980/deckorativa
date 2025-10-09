@@ -15,6 +15,10 @@
                     </p>
                 </div>
                 <div class="mt-6 lg:mt-0 flex gap-3">
+                    <button onclick="window.print()" class="btn-outline">
+                        <i class="fas fa-print mr-2"></i>
+                        Imprimir
+                    </button>
                     @can('edit servicios')
                     <a href="{{ route('servicios.edit', $servicio) }}" class="btn-primary">
                         <i class="fas fa-edit mr-2"></i>
@@ -131,4 +135,43 @@
             </div>
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        @media print {
+            /* Ocultar navbar y elementos de navegación */
+            nav,
+            .navbar,
+            header,
+            .page-header .flex,
+            .btn-primary,
+            .btn-outline {
+                display: none !important;
+            }
+
+            /* Ocultar sidebar si existe */
+            aside,
+            .sidebar {
+                display: none !important;
+            }
+
+            /* Ajustar el contenido para que use toda la página */
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .page-header {
+                display: none !important;
+            }
+
+            /* Asegurar que el contenido principal use todo el espacio */
+            main,
+            .animate-slideInUp {
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+        }
+    </style>
+    @endpush
 @endsection

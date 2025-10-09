@@ -32,7 +32,7 @@ class ServicioController extends Controller
         }
 
         $servicios = $query->orderBy('created_at', 'desc')
-                          ->paginate(12);
+                          ->paginate(50);
 
         $categorias = Categoria::activo()->orderBy('nombre')->get();
 

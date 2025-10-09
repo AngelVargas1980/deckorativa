@@ -125,7 +125,7 @@
 
                         <div>
                             <label class="form-label">{{ $categoria->imagen ? 'Cambiar Imagen' : 'Agregar Imagen' }} (opcional)</label>
-                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                            <div id="drop-zone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
                                 <div class="space-y-1 text-center">
                                     <div id="preview-container" class="hidden">
                                         <img id="image-preview" class="mx-auto h-32 w-32 object-cover rounded-lg shadow-md">
@@ -196,6 +196,45 @@
         function removeCurrentImage() {
             document.getElementById('remove_image').value = '1';
             document.querySelector('.relative.inline-block').style.display = 'none';
+        }
+
+        // Drag & Drop functionality
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('imagen');
+
+        if (dropZone && fileInput) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.add('border-indigo-500', 'bg-indigo-50');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => {
+                    dropZone.classList.remove('border-indigo-500', 'bg-indigo-50');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    previewImage({ target: { files: files } });
+                }
+            }
         }
     </script>
     @endpush

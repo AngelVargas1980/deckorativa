@@ -292,11 +292,18 @@
     <script>
         // Inicializar Select2 para el selector de clientes
         $(document).ready(function() {
-            $('#select-cliente').select2({
-                placeholder: 'Buscar cliente por nombre o email...',
-                allowClear: true,
-                width: '100%'
-            });
+            // Pequeño delay para asegurar que Select2 esté completamente cargado
+            setTimeout(function() {
+                if ($('#select-cliente').length && typeof $.fn.select2 !== 'undefined') {
+                    $('#select-cliente').select2({
+                        placeholder: 'Buscar cliente por nombre o email...',
+                        allowClear: true,
+                        width: '100%'
+                    });
+                } else {
+                    console.error('Select2 no está disponible o el elemento no existe');
+                }
+            }, 100);
         });
 
         // Cargar servicios con sus categorías

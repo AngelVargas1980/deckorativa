@@ -42,7 +42,8 @@ class ServicioController extends Controller
                           ->paginate($perPage)
                           ->appends($request->except('page'));
 
-        $categorias = Categoria::activo()->orderBy('nombre')->get();
+        // Obtener todas las categorías (activas e inactivas), solo excluir eliminadas
+        $categorias = Categoria::orderBy('nombre')->get();
 
         return view('servicios.index', compact('servicios', 'categorias'));
     }

@@ -22,9 +22,10 @@ class CategoriaController extends Controller
             $query->where('activo', $request->activo);
         }
 
+        $perPage = $request->input('per_page', 5);
         $categorias = $query->withCount('servicios')
                            ->orderBy('created_at', 'desc')
-                           ->paginate(5);
+                           ->paginate($perPage);
 
         return view('categorias.index', compact('categorias'));
     }
@@ -78,7 +79,16 @@ class CategoriaController extends Controller
             'activo' => 'boolean'
         ]);
 
+        // Verificar si se está intentando desactivar una categoría con servicios asociados
+        $activo = $request->input('activo', 0);
+        if (!$activo && $categoria->servicios()->count() > 0) {
+            return redirect()->back()
+                            ->withInput()
+                            ->with('error', 'No se puede desactivar la categoría porque tiene ' . $categoria->servicios()->count() . ' servicio(s) asociado(s).');
+        }
+
         $data = $request->all();
+        $data['activo'] = $activo;
 
         if ($request->hasFile('imagen')) {
             // Eliminar imagen anterior

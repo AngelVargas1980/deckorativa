@@ -63,7 +63,8 @@
 
                         <div>
                             <label class="form-label flex items-center">
-                                <input type="checkbox" name="activo" value="1" {{ old('activo', $categoria->activo) ? 'checked' : '' }} 
+                                <input type="hidden" name="activo" value="0">
+                                <input type="checkbox" name="activo" value="1" {{ old('activo', $categoria->activo ? '1' : '0') == '1' ? 'checked' : '' }}
                                        class="mr-2 rounded">
                                 <i class="fas fa-check-circle mr-2 text-green-600"></i>
                                 Categoría Activa

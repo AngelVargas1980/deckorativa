@@ -53,7 +53,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="form-label required">Cliente</label>
-                                    <select name="client_id" class="form-select @error('client_id') border-red-500 @enderror" required>
+                                    <select name="client_id" id="select-cliente" class="form-select @error('client_id') border-red-500 @enderror" required>
                                         @foreach($clientes as $cliente)
                                             <option value="{{ $cliente->id }}" {{ old('client_id', $cotizacion->client_id) == $cliente->id ? 'selected' : '' }}>
                                                 {{ $cliente->name }} - {{ $cliente->email }}
@@ -263,8 +263,41 @@
         </div>
     </div>
 
+    @push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 42px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            padding: 0.5rem !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px !important;
+            padding-left: 0 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+        }
+    </style>
+    @endpush
+
     @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        // Inicializar Select2 para el selector de clientes
+        $(document).ready(function() {
+            $('#select-cliente').select2({
+                placeholder: 'Buscar cliente por nombre o email...',
+                allowClear: false,
+                width: '100%'
+            });
+        });
+
         let serviciosDisponibles = @json($categorias->load('servicios')->pluck('servicios')->flatten());
         let serviciosSeleccionados = [];
         let contadorServicios = 0;

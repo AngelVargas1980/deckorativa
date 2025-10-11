@@ -23,9 +23,25 @@
             </div>
         </div>
 
+        @if($errors->any())
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle text-xl"></i>
+                    <div>
+                        <h4 class="font-semibold">Error en el formulario</h4>
+                        <ul class="list-disc list-inside mt-2">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <form action="{{ route('cotizaciones.store') }}" method="POST" id="cotizacion-form">
             @csrf
-            
+
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Información del Cliente -->
@@ -167,7 +183,7 @@
                             </div>
 
                             <div class="pt-4 border-t">
-                                <button type="submit" class="w-full btn-primary">
+                                <button type="submit" class="w-full btn-primary" onclick="return validarFormulario(event)">
                                     <i class="fas fa-save mr-2"></i>
                                     Crear Cotización
                                 </button>
@@ -248,8 +264,41 @@
         </div>
     </div>
 
+    @push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: 42px !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+            padding: 0.5rem !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 28px !important;
+            padding-left: 0 !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
+        .select2-dropdown {
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.5rem !important;
+        }
+    </style>
+    @endpush
+
     @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        // Inicializar Select2 para el selector de clientes
+        $(document).ready(function() {
+            $('#select-cliente').select2({
+                placeholder: 'Buscar cliente por nombre o email...',
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
         let serviciosDisponibles = @json($categorias->load('servicios')->pluck('servicios')->flatten());
         let serviciosSeleccionados = [];
         let contadorServicios = 0;
@@ -529,6 +578,81 @@
         function cerrarModal() {
             document.getElementById('modal-servicios').classList.add('hidden');
         }
+
+        function validarFormulario(event) {
+            console.log('=== VALIDACIÓN FORMULARIO ===');
+
+            // Validar que haya seleccionado un cliente
+            const clienteId = document.querySelector('select[name="client_id"]').value;
+            console.log('Cliente seleccionado:', clienteId);
+
+            if (!clienteId) {
+                event.preventDefault();
+                alert('Por favor selecciona un cliente');
+                return false;
+            }
+
+            // Validar que haya al menos un servicio
+            console.log('Servicios seleccionados:', serviciosSeleccionados.length);
+
+            if (serviciosSeleccionados.length === 0) {
+                event.preventDefault();
+                alert('Por favor agrega al menos un servicio o producto a la cotización');
+                return false;
+            }
+
+            // CRÍTICO: Re-renderizar servicios para asegurar que los inputs estén en el DOM
+            console.log('⚠️ Re-renderizando servicios antes de enviar...');
+            renderizarServicios();
+
+            // Pequeño delay para asegurar que el DOM se actualice
+            setTimeout(() => {
+                // Verificar campos de servicios en el DOM
+                const servicioInputs = document.querySelectorAll('input[name^="servicios"]');
+                console.log('=== CAMPOS DE SERVICIOS EN DOM ===', servicioInputs.length);
+                servicioInputs.forEach(input => {
+                    console.log(`${input.name} = ${input.value}`);
+                });
+
+                // Verificar si el contenedor está dentro del form
+                const container = document.getElementById('servicios-seleccionados');
+                const form = document.getElementById('cotizacion-form');
+                console.log('Container dentro del form:', form.contains(container));
+
+                // Log para debug de datos que se enviarán
+                const formData = new FormData(document.getElementById('cotizacion-form'));
+                console.log('=== DATOS DEL FORMULARIO (FormData) ===');
+                let hasServicios = false;
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                    if (pair[0].startsWith('servicios')) {
+                        hasServicios = true;
+                    }
+                }
+
+                if (!hasServicios) {
+                    console.error('❌ ERROR: Los servicios NO se están enviando en el FormData');
+                    console.log('Servicios en memoria:', serviciosSeleccionados);
+                } else {
+                    console.log('✅ Servicios detectados en FormData, enviando formulario...');
+                    // Enviar el formulario manualmente
+                    document.getElementById('cotizacion-form').submit();
+                }
+            }, 100);
+
+            // Prevenir el envío automático para que podamos enviarlo después del delay
+            event.preventDefault();
+            return false;
+        }
+
+        // Debug: Mostrar errores de validación si existen
+        @if($errors->any())
+            console.error('Errores de validación:', @json($errors->all()));
+            alert('Error en el formulario:\n' + @json($errors->all()).join('\n'));
+        @endif
+
+        // Agregar log cuando se carga la página
+        console.log('=== FORMULARIO CREACIÓN COTIZACIÓN CARGADO ===');
     </script>
     @endpush
 @endsection

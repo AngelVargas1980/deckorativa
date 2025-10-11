@@ -17,7 +17,7 @@ class CotizacionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Cotizacion::with(['client', 'user']);
+        $query = Cotizacion::with(['client', 'user'])->withCount('detalles');
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -43,8 +43,9 @@ class CotizacionController extends Controller
             $query->whereDate('created_at', '<=', $request->fecha_hasta);
         }
 
+        $perPage = $request->input('per_page', 5);
         $cotizaciones = $query->orderBy('created_at', 'desc')
-                             ->paginate(10);
+                             ->paginate($perPage);
 
         return view('cotizaciones.index', compact('cotizaciones'));
     }
@@ -52,16 +53,32 @@ class CotizacionController extends Controller
     public function create()
     {
         $clientes = Client::orderBy('first_name')->get();
-        $categorias = Categoria::activo()->with('servicios')->orderBy('nombre')->get();
+
+        // Cargar categorías activas con sus servicios activos y la relación categoria en cada servicio
+        $categorias = Categoria::activo()
+            ->with(['servicios' => function($query) {
+                $query->where('activo', true)->with('categoria');
+            }])
+            ->orderBy('nombre')
+            ->get();
+
         return view('cotizaciones.create', compact('clientes', 'categorias'));
     }
 
     public function store(Request $request)
     {
+        // Log de debug
+        \Log::info('=== CREAR COTIZACIÓN - DATOS RECIBIDOS ===', [
+            'all_data' => $request->all(),
+            'client_id' => $request->client_id,
+            'servicios_count' => is_array($request->servicios) ? count($request->servicios) : 0,
+            'servicios' => $request->servicios
+        ]);
+
         $request->validate([
             'client_id' => 'required|exists:clients,id',
             'observaciones' => 'nullable|string',
-            'fecha_vigencia' => 'nullable|date|after:today',
+            'fecha_vigencia' => 'nullable|date|after_or_equal:today',
             'descuento' => 'nullable|numeric|min:0',
             'servicios' => 'required|array|min:1',
             'servicios.*.servicio_id' => 'required|exists:servicios,id',
@@ -69,9 +86,12 @@ class CotizacionController extends Controller
             'servicios.*.notas' => 'nullable|string'
         ]);
 
+        \Log::info('=== VALIDACIÓN PASADA ===');
+
         DB::beginTransaction();
 
         try {
+            \Log::info('=== CREANDO COTIZACIÓN ===');
             $cotizacion = Cotizacion::create([
                 'client_id' => $request->client_id,
                 'user_id' => Auth::id(),
@@ -79,26 +99,38 @@ class CotizacionController extends Controller
                 'fecha_vigencia' => $request->fecha_vigencia ?: now()->addDays(30),
                 'descuento' => $request->descuento ?: 0
             ]);
+            \Log::info('Cotización creada con ID: ' . $cotizacion->id);
 
-            foreach ($request->servicios as $servicioData) {
+            \Log::info('=== AGREGANDO DETALLES ===');
+            foreach ($request->servicios as $index => $servicioData) {
+                \Log::info("Procesando servicio {$index}", $servicioData);
                 $servicio = Servicio::findOrFail($servicioData['servicio_id']);
 
-                CotizacionDetalle::create([
+                $detalle = CotizacionDetalle::create([
                     'cotizacion_id' => $cotizacion->id,
                     'servicio_id' => $servicio->id,
                     'cantidad' => $servicioData['cantidad'],
                     'precio_unitario' => $servicio->precio,
                     'notas' => $servicioData['notas'] ?? null
                 ]);
+                \Log::info("Detalle creado con ID: {$detalle->id}");
             }
 
+            \Log::info('=== CALCULANDO TOTALES ===');
             $cotizacion->calcularTotales();
+            \Log::info('Totales calculados - Subtotal: ' . $cotizacion->subtotal . ', Total: ' . $cotizacion->total);
 
+            \Log::info('=== COMMIT TRANSACCIÓN ===');
             DB::commit();
+            \Log::info('=== COTIZACIÓN GUARDADA EXITOSAMENTE ===');
 
             return redirect()->route('cotizaciones.show', $cotizacion)
                             ->with('success', 'Cotización creada exitosamente.');
         } catch (\Exception $e) {
+            \Log::error('=== ERROR AL CREAR COTIZACIÓN ===', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             DB::rollback();
             return redirect()->back()
                             ->withInput()
@@ -120,7 +152,15 @@ class CotizacionController extends Controller
         }
 
         $clientes = Client::orderBy('first_name')->get();
-        $categorias = Categoria::activo()->with('servicios')->orderBy('nombre')->get();
+
+        // Cargar categorías activas con sus servicios activos y la relación categoria en cada servicio
+        $categorias = Categoria::activo()
+            ->with(['servicios' => function($query) {
+                $query->where('activo', true)->with('categoria');
+            }])
+            ->orderBy('nombre')
+            ->get();
+
         $cotizacion->load(['client', 'detalles.servicio']);
 
         return view('cotizaciones.edit', compact('cotizacion', 'clientes', 'categorias'));
@@ -224,7 +264,8 @@ class CotizacionController extends Controller
 
             // Enviar correo al cliente
             Mail::send('emails.cotizacion-cliente', ['cotizacion' => $cotizacion], function($message) use ($cotizacion) {
-                $message->to($cotizacion->client->email, $cotizacion->client->nombre_completo)
+                $message->to($cotizacion->client->email, $cotizacion->client->name)
+                        ->cc($cotizacion->user->email, $cotizacion->user->name) // Copia al usuario que creó la cotización
                         ->subject('Cotización ' . $cotizacion->numero_cotizacion . ' - DECKORATIVA');
             });
 
@@ -236,7 +277,7 @@ class CotizacionController extends Controller
             ]);
 
             return redirect()->back()
-                            ->with('success', 'Cotización enviada por email exitosamente a ' . $cotizacion->client->email);
+                            ->with('success', 'Cotización enviada por email a ' . $cotizacion->client->email . ' con copia a ' . $cotizacion->user->email);
 
         } catch (\Exception $e) {
             \Log::error('Error al enviar cotización por email', [

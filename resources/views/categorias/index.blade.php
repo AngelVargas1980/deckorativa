@@ -98,11 +98,20 @@
                 </div>
                 <div class="flex items-center space-x-3">
                     <form method="GET" class="flex items-center space-x-2">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if(request('activo') !== null)
+                            <input type="hidden" name="activo" value="{{ request('activo') }}">
+                        @endif
                         <label class="text-sm text-gray-600 font-medium">Mostrar:</label>
                         <select name="per_page" onchange="this.form.submit()" class="form-select py-2 text-sm">
-                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
-                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
-                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                            <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
+                            <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page', 5) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ request('per_page', 5) == 20 ? 'selected' : '' }}>20</option>
+                            <option value="50" {{ request('per_page', 5) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page', 5) == 100 ? 'selected' : '' }}>100</option>
                         </select>
                     </form>
                 </div>
@@ -170,14 +179,14 @@
                                 <td>
                                     <div class="flex items-center">
                                         @if($categoria->imagen)
-                                            <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden shadow-md mr-4">
+                                            <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden shadow-md mr-4">
                                                 <img src="{{ asset('storage/' . $categoria->imagen) }}"
                                                      alt="{{ $categoria->nombre }}"
                                                      class="w-full h-full object-cover">
                                             </div>
                                         @else
-                                            <div class="w-20 h-20 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md mr-4">
-                                                <span class="text-white font-bold text-lg">
+                                            <div class="w-32 h-32 bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-md mr-4">
+                                                <span class="text-white font-bold text-2xl">
                                                     {{ strtoupper(substr($categoria->nombre, 0, 2)) }}
                                                 </span>
                                             </div>
@@ -288,11 +297,26 @@
         </div>
 
         <!-- Pagination -->
+        @if($categorias->hasPages())
         <div class="mt-8 flex justify-center">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                {{ $categorias->appends(request()->query())->links() }}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4 w-full max-w-4xl">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-sm text-gray-700 order-2 sm:order-1">
+                        Mostrando
+                        <span class="font-medium">{{ $categorias->firstItem() ?? 0 }}</span>
+                        a
+                        <span class="font-medium">{{ $categorias->lastItem() ?? 0 }}</span>
+                        de
+                        <span class="font-medium">{{ $categorias->total() }}</span>
+                        resultados
+                    </div>
+                    <div class="order-1 sm:order-2">
+                        {{ $categorias->appends(request()->query())->links() }}
+                    </div>
+                </div>
             </div>
         </div>
+        @endif
         </div>
     </div>
 

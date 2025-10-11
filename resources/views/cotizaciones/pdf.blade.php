@@ -179,13 +179,13 @@
     <!-- Información del Cliente -->
     <div class="cliente-info">
         <h3 style="margin: 0 0 10px 0; color: #059669;">Información del Cliente</h3>
-        <div><strong>Cliente:</strong> {{ $cotizacion->client->nombre_completo }}</div>
+        <div><strong>Cliente:</strong> {{ $cotizacion->client->name }}</div>
         <div><strong>Email:</strong> {{ $cotizacion->client->email }}</div>
         @if($cotizacion->client->phone)
             <div><strong>Teléfono:</strong> {{ $cotizacion->client->phone }}</div>
         @endif
-        @if($cotizacion->client->address)
-            <div><strong>Dirección:</strong> {{ $cotizacion->client->address }}</div>
+        @if($cotizacion->client->identification_number)
+            <div><strong>NIT/DPI:</strong> {{ $cotizacion->client->identification_number }}</div>
         @endif
     </div>
 
@@ -239,8 +239,8 @@
         </div>
         @endif
         <div class="total-row">
-            <span>IVA ({{ $cotizacion->impuesto_porcentaje }}%):</span>
-            <span>Q{{ number_format($cotizacion->impuesto, 2) }}</span>
+            <span>IVA (12%):</span>
+            <span>Q{{ number_format($cotizacion->total_impuesto, 2) }}</span>
         </div>
         <div class="total-final">
             <span>TOTAL:</span>

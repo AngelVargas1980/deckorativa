@@ -96,6 +96,31 @@
                         <p class="text-sm text-gray-600">Gestiona todas las cotizaciones del sistema</p>
                     </div>
                 </div>
+                <div class="flex items-center space-x-3">
+                    <form method="GET" class="flex items-center space-x-2">
+                        @if(request('search'))
+                            <input type="hidden" name="search" value="{{ request('search') }}">
+                        @endif
+                        @if(request('estado'))
+                            <input type="hidden" name="estado" value="{{ request('estado') }}">
+                        @endif
+                        @if(request('fecha_desde'))
+                            <input type="hidden" name="fecha_desde" value="{{ request('fecha_desde') }}">
+                        @endif
+                        @if(request('fecha_hasta'))
+                            <input type="hidden" name="fecha_hasta" value="{{ request('fecha_hasta') }}">
+                        @endif
+                        <label class="text-sm text-gray-600 font-medium">Mostrar:</label>
+                        <select name="per_page" onchange="this.form.submit()" class="form-select py-2 text-sm">
+                            <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
+                            <option value="10" {{ request('per_page', 5) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page', 5) == 15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ request('per_page', 5) == 20 ? 'selected' : '' }}>20</option>
+                            <option value="50" {{ request('per_page', 5) == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page', 5) == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                    </form>
+                </div>
             </div>
 
             <!-- Filtros -->
@@ -180,17 +205,21 @@
                                     <div class="text-sm text-gray-600">ID: #{{ $cotizacion->id }}</div>
                                 </td>
                                 <td>
+                                    @if($cotizacion->client)
                                     <div class="flex items-center">
                                         <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center mr-3">
                                             <span class="text-white font-bold text-sm">
-                                                {{ strtoupper(substr($cotizacion->client->name ?? 'C', 0, 2)) }}
+                                                {{ strtoupper(substr($cotizacion->client->first_name, 0, 1) . substr($cotizacion->client->last_name ?? '', 0, 1)) }}
                                             </span>
                                         </div>
                                         <div>
-                                            <div class="font-medium text-gray-900">{{ $cotizacion->client->name ?? 'Cliente' }}</div>
-                                            <div class="text-sm text-gray-600">{{ $cotizacion->client->email ?? '' }}</div>
+                                            <div class="font-medium text-gray-900">{{ $cotizacion->client->name }}</div>
+                                            <div class="text-sm text-gray-600">{{ $cotizacion->client->email }}</div>
                                         </div>
                                     </div>
+                                    @else
+                                    <span class="text-gray-400 italic">Sin cliente</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="text-gray-900">{{ $cotizacion->created_at->format('d/m/Y') }}</div>
@@ -198,8 +227,8 @@
                                 </td>
                                 <td>
                                     <div class="text-xl font-bold text-green-600">Q{{ number_format($cotizacion->total, 2) }}</div>
-                                    @if($cotizacion->detalles_count ?? 0 > 0)
-                                        <div class="text-sm text-gray-600">{{ $cotizacion->detalles_count ?? 0 }} items</div>
+                                    @if($cotizacion->detalles_count > 0)
+                                        <div class="text-sm text-gray-600">{{ $cotizacion->detalles_count }} items</div>
                                     @endif
                                 </td>
                                 <td>
@@ -296,8 +325,21 @@
         <!-- Pagination -->
         @if($cotizaciones->hasPages())
         <div class="mt-8 flex justify-center">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                {{ $cotizaciones->appends(request()->query())->links() }}
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4 w-full max-w-4xl">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-sm text-gray-700 order-2 sm:order-1">
+                        Mostrando
+                        <span class="font-medium">{{ $cotizaciones->firstItem() ?? 0 }}</span>
+                        a
+                        <span class="font-medium">{{ $cotizaciones->lastItem() ?? 0 }}</span>
+                        de
+                        <span class="font-medium">{{ $cotizaciones->total() }}</span>
+                        resultados
+                    </div>
+                    <div class="order-1 sm:order-2">
+                        {{ $cotizaciones->appends(request()->query())->links() }}
+                    </div>
+                </div>
             </div>
         </div>
         @endif
@@ -360,7 +402,34 @@
             }
 
             function exportCotizaciones() {
-                alert('Función de exportación en desarrollo');
+                // Crear tabla temporal con los datos visibles
+                let tabla = document.querySelector('.custom-table').cloneNode(true);
+
+                // Limpiar columna de acciones
+                tabla.querySelectorAll('th:last-child, td:last-child').forEach(el => el.remove());
+
+                // Convertir a formato CSV
+                let csv = [];
+                let rows = tabla.querySelectorAll('tr');
+
+                for (let i = 0; i < rows.length; i++) {
+                    let row = [], cols = rows[i].querySelectorAll('td, th');
+
+                    for (let j = 0; j < cols.length; j++) {
+                        let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/\s+/g, ' ').trim();
+                        data = data.replace(/"/g, '""');
+                        row.push('"' + data + '"');
+                    }
+
+                    csv.push(row.join(','));
+                }
+
+                // Descargar archivo CSV
+                let csvFile = csv.join('\n');
+                let downloadLink = document.createElement('a');
+                downloadLink.download = 'cotizaciones_' + new Date().toISOString().slice(0,10) + '.csv';
+                downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csvFile);
+                downloadLink.click();
             }
         </script>
     @endpush

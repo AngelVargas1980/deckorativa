@@ -56,8 +56,23 @@ class Cotizacion extends Model
     public static function generarNumeroCotizacion()
     {
         $year = date('Y');
-        $ultimo = self::whereYear('created_at', $year)->count() + 1;
-        return 'COT-' . $year . '-' . str_pad($ultimo, 4, '0', STR_PAD_LEFT);
+        $prefix = 'COT-' . $year . '-';
+
+        // Buscar el último número de cotización del año
+        $ultimaCotizacion = self::whereYear('created_at', $year)
+            ->where('numero_cotizacion', 'LIKE', $prefix . '%')
+            ->orderByRaw('CAST(SUBSTRING(numero_cotizacion, 10) AS UNSIGNED) DESC')
+            ->first();
+
+        if ($ultimaCotizacion) {
+            // Extraer el número del formato COT-YYYY-NNNN
+            $ultimoNumero = (int) substr($ultimaCotizacion->numero_cotizacion, -4);
+            $nuevoNumero = $ultimoNumero + 1;
+        } else {
+            $nuevoNumero = 1;
+        }
+
+        return $prefix . str_pad($nuevoNumero, 4, '0', STR_PAD_LEFT);
     }
 
     public function client()

@@ -299,7 +299,27 @@
             });
         });
 
-        let serviciosDisponibles = @json($categorias->load('servicios')->pluck('servicios')->flatten());
+        // Cargar servicios con sus categorías
+        let serviciosDisponibles = [];
+        @foreach($categorias as $categoria)
+            @foreach($categoria->servicios as $servicio)
+                serviciosDisponibles.push({
+                    id: {{ $servicio->id }},
+                    nombre: "{{ addslashes($servicio->nombre) }}",
+                    descripcion: "{{ addslashes($servicio->descripcion ?? '') }}",
+                    precio: {{ $servicio->precio }},
+                    tipo: "{{ $servicio->tipo }}",
+                    categoria_id: {{ $servicio->categoria_id }},
+                    activo: {{ $servicio->activo ? 'true' : 'false' }},
+                    imagen: "{{ $servicio->imagen ?? '' }}",
+                    categoria: {
+                        id: {{ $categoria->id }},
+                        nombre: "{{ addslashes($categoria->nombre) }}"
+                    }
+                });
+            @endforeach
+        @endforeach
+
         let serviciosSeleccionados = [];
         let contadorServicios = 0;
         let paginaActual = 1;

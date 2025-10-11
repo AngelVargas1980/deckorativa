@@ -21,9 +21,9 @@ class PublicController extends Controller
 
     public function servicios(Request $request)
     {
-        $query = Servicio::with('categoria');
+        $query = Servicio::with('categoria')->where('activo', true);
 
-        // Filtrar por tipo
+        // Filtrar por tipo (tabs)
         if ($request->filled('tipo')) {
             $query->where('tipo', $request->tipo);
         }
@@ -47,7 +47,10 @@ class PublicController extends Controller
             $query->where('precio', '<=', $request->precio_max);
         }
 
-        $servicios = $query->paginate(12);
+        $servicios = $query->orderBy('nombre')
+                          ->paginate(12)
+                          ->appends($request->except('page'));
+
         $categorias = Categoria::all();
 
         return view('public.servicios', compact('servicios', 'categorias'));

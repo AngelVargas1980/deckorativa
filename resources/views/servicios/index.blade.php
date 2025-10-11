@@ -56,6 +56,29 @@
         @endif
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Tabs de Servicios y Productos -->
+            <div class="mb-6">
+                <div class="border-b border-gray-200">
+                    <nav class="flex -mb-px space-x-8" aria-label="Tabs">
+                        <a href="{{ route('servicios.index', array_merge(request()->except('tipo'), ['tipo' => 'servicio'])) }}"
+                           class="tab-link {{ request('tipo') == 'servicio' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg transition-colors duration-200 inline-flex items-center">
+                            <i class="fas fa-handshake mr-2"></i>
+                            Servicios
+                        </a>
+                        <a href="{{ route('servicios.index', array_merge(request()->except('tipo'), ['tipo' => 'producto'])) }}"
+                           class="tab-link {{ request('tipo') == 'producto' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg transition-colors duration-200 inline-flex items-center">
+                            <i class="fas fa-box mr-2"></i>
+                            Productos
+                        </a>
+                        <a href="{{ route('servicios.index') }}"
+                           class="tab-link {{ !request()->has('tipo') ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg transition-colors duration-200 inline-flex items-center">
+                            <i class="fas fa-th-large mr-2"></i>
+                            Ver Todo
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div class="stat-card">
                 <div class="stat-icon bg-gradient-to-r from-cyan-500 to-cyan-600">
@@ -111,6 +134,11 @@
             <!-- Filtros Avanzados -->
             <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
                 <form method="GET" class="flex flex-wrap items-end gap-4">
+                    <!-- Mantener el tipo seleccionado del tab -->
+                    @if(request('tipo'))
+                        <input type="hidden" name="tipo" value="{{ request('tipo') }}">
+                    @endif
+
                     <div class="flex-1 min-w-0">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                         <input type="text" name="search" value="{{ request('search') }}"
@@ -126,14 +154,6 @@
                                     {{ $categoria->nombre }}
                                 </option>
                             @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-                        <select name="tipo" class="form-select">
-                            <option value="">Todos</option>
-                            <option value="servicio" {{ request('tipo') === 'servicio' ? 'selected' : '' }}>Servicios</option>
-                            <option value="producto" {{ request('tipo') === 'producto' ? 'selected' : '' }}>Productos</option>
                         </select>
                     </div>
                     <div>

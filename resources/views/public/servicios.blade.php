@@ -22,6 +22,15 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+        .tab-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .tab-link:hover svg {
+            transform: translateY(-2px);
+            transition: transform 0.2s ease;
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800 bg-gray-50">
@@ -68,7 +77,13 @@
             @endif
         </h1>
         <p class="text-xl lg:text-2xl opacity-90 max-w-3xl mx-auto">
-            Descubre todos nuestros servicios y productos de decoración y agrega los que necesitas a tu carrito para obtener una cotización personalizada.
+            @if(request('tipo') == 'producto')
+                Explora nuestra selección de productos de decoración y agrega los que necesitas a tu carrito para obtener una cotización personalizada.
+            @elseif(request('tipo') == 'servicio')
+                Conoce todos nuestros servicios de decoración profesional y agrega los que necesitas a tu carrito para obtener una cotización personalizada.
+            @else
+                Descubre todos nuestros servicios y productos de decoración y agrega los que necesitas a tu carrito para obtener una cotización personalizada.
+            @endif
         </p>
     </div>
 </section>
@@ -76,23 +91,48 @@
 <!-- Filtros y Servicios -->
 <section class="py-12">
     <div class="max-w-7xl mx-auto px-6">
+        <!-- Tabs de Servicios y Productos -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px space-x-8" aria-label="Tabs">
+                    <a href="{{ route('public.servicios', array_merge(request()->except('tipo'), ['tipo' => 'servicio'])) }}"
+                       class="tab-link {{ request('tipo') == 'servicio' || (!request()->has('tipo') && !request('search') && !request('categoria')) ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg transition-colors duration-200">
+                        <svg class="inline-block w-5 h-5 mr-2 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Servicios
+                    </a>
+                    <a href="{{ route('public.servicios', array_merge(request()->except('tipo'), ['tipo' => 'producto'])) }}"
+                       class="tab-link {{ request('tipo') == 'producto' ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg transition-colors duration-200">
+                        <svg class="inline-block w-5 h-5 mr-2 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        Productos
+                    </a>
+                    <a href="{{ route('public.servicios') }}"
+                       class="tab-link {{ !request()->has('tipo') && (request('search') || request('categoria') || request('precio_min') || request('precio_max')) ? 'border-purple-600 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg transition-colors duration-200">
+                        <svg class="inline-block w-5 h-5 mr-2 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                        Ver Todo
+                    </a>
+                </nav>
+            </div>
+        </div>
+
         <!-- Filtros -->
         <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
             <form method="GET" class="flex flex-wrap items-end gap-4">
+                <!-- Mantener el tipo seleccionado del tab -->
+                @if(request('tipo'))
+                    <input type="hidden" name="tipo" value="{{ request('tipo') }}">
+                @endif
+
                 <div class="flex-1 min-w-0">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar servicios</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
                     <input type="text" name="search" value="{{ request('search') }}"
                            placeholder="Buscar por nombre..."
                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
-                    <select name="tipo" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                        <option value="">Todos</option>
-                        <option value="servicio" {{ request('tipo') == 'servicio' ? 'selected' : '' }}>Servicios</option>
-                        <option value="producto" {{ request('tipo') == 'producto' ? 'selected' : '' }}>Productos</option>
-                    </select>
                 </div>
 
                 <div>

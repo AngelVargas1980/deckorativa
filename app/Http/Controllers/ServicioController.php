@@ -13,26 +13,34 @@ class ServicioController extends Controller
     {
         $query = Servicio::with('categoria');
 
-        if ($request->has('search')) {
+        // Filtro de búsqueda
+        if ($request->has('search') && $request->search !== '') {
             $search = $request->search;
-            $query->where('nombre', 'LIKE', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%{$search}%")
                   ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
         }
 
-        if ($request->has('categoria_id') && $request->categoria_id !== '') {
-            $query->where('categoria_id', $request->categoria_id);
-        }
-
+        // Filtro por tipo (tabs)
         if ($request->has('tipo') && $request->tipo !== '') {
             $query->where('tipo', $request->tipo);
         }
 
+        // Filtro de categoría
+        if ($request->has('categoria_id') && $request->categoria_id !== '') {
+            $query->where('categoria_id', $request->categoria_id);
+        }
+
+        // Filtro de estado
         if ($request->has('activo') && $request->activo !== '') {
             $query->where('activo', $request->activo);
         }
 
+        $perPage = $request->get('per_page', 12);
         $servicios = $query->orderBy('created_at', 'desc')
-                          ->paginate(50);
+                          ->paginate($perPage)
+                          ->appends($request->except('page'));
 
         $categorias = Categoria::activo()->orderBy('nombre')->get();
 

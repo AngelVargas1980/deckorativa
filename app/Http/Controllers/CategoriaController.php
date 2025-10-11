@@ -12,12 +12,16 @@ class CategoriaController extends Controller
     {
         $query = Categoria::query();
 
-        if ($request->has('search')) {
+        // Filtro de búsqueda
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('nombre', 'LIKE', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%{$search}%")
                   ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
         }
 
+        // Filtro de estado (activo/inactivo)
         if ($request->has('activo') && $request->activo !== '') {
             $query->where('activo', $request->activo);
         }
@@ -25,7 +29,8 @@ class CategoriaController extends Controller
         $perPage = $request->input('per_page', 5);
         $categorias = $query->withCount('servicios')
                            ->orderBy('created_at', 'desc')
-                           ->paginate($perPage);
+                           ->paginate($perPage)
+                           ->appends($request->except('page'));
 
         return view('categorias.index', compact('categorias'));
     }

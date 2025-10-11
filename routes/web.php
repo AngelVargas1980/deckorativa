@@ -93,6 +93,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas para HU8: Gestión de Servicios, Productos y Categorías
     Route::resource('categorias', CategoriaController::class)->middleware('permission:view categorias');
+    Route::post('categorias/{categoria}/desactivar-servicios', [CategoriaController::class, 'desactivarServicios'])
+        ->name('categorias.desactivar-servicios')
+        ->middleware('permission:edit categorias');
     Route::resource('servicios', ServicioController::class)->middleware('permission:view servicios');
     
     // Rutas API para obtener datos dinámicamente

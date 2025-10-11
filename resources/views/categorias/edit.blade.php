@@ -29,7 +29,7 @@
 
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="card">
-                <form action="{{ route('categorias.update', $categoria) }}" method="POST" enctype="multipart/form-data">
+                <form id="form-categoria" action="{{ route('categorias.update', $categoria) }}" method="POST" enctype="multipart/form-data" onsubmit="return validarFormulario(event)">
                 @csrf
                 @method('PUT')
                 
@@ -64,7 +64,7 @@
                         <div>
                             <label class="form-label flex items-center">
                                 <input type="hidden" name="activo" value="0">
-                                <input type="checkbox" name="activo" value="1" {{ old('activo', $categoria->activo ? '1' : '0') == '1' ? 'checked' : '' }}
+                                <input type="checkbox" id="checkbox-activo" name="activo" value="1" {{ old('activo', $categoria->activo ? '1' : '0') == '1' ? 'checked' : '' }}
                                        class="mr-2 rounded">
                                 <i class="fas fa-check-circle mr-2 text-green-600"></i>
                                 Categoría Activa
@@ -173,8 +173,163 @@
         </div>
     </div>
 
+    <!-- Modal de Advertencia -->
+    <div id="modal-advertencia" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full">
+                <div class="px-6 py-4 bg-yellow-500">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3"></i>
+                        No se puede desactivar la categoría
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">
+                        Esta categoría tiene <strong id="count-servicios"></strong> servicios/productos activos.
+                        No puedes desactivar la categoría mientras tenga elementos activos.
+                    </p>
+
+                    <!-- Lista de Servicios -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4 max-h-60 overflow-y-auto">
+                        <h4 class="font-medium text-gray-900 mb-3">
+                            <i class="fas fa-list mr-2"></i>
+                            Servicios/Productos Activos:
+                        </h4>
+                        <ul id="lista-servicios-activos" class="space-y-2">
+                            <!-- Se llenará con JavaScript -->
+                        </ul>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                        <p class="text-sm text-blue-700">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Opciones:</strong>
+                        </p>
+                        <ul class="list-disc list-inside text-sm text-blue-700 mt-2 ml-4">
+                            <li>Desactiva manualmente cada servicio/producto desde su página de edición</li>
+                            <li>O usa el botón "Desactivar Todo" para desactivarlos automáticamente</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 flex justify-between">
+                    <button type="button" onclick="cerrarModal()" class="btn-outline">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="desactivarTodo()" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium">
+                        <i class="fas fa-power-off mr-2"></i>
+                        Desactivar Todo y Continuar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
+        const categoriaId = {{ $categoria->id }};
+        const estadoInicial = {{ $categoria->activo ? 'true' : 'false' }};
+        let serviciosActivos = @json($categoria->servicios);
+        let formularioValidado = false;
+
+        function validarFormulario(event) {
+            // Si ya fue validado, permitir envío
+            if (formularioValidado) {
+                return true;
+            }
+
+            const checkbox = document.getElementById('checkbox-activo');
+            const quiereDesactivar = !checkbox.checked;
+
+            // Si está intentando desactivar la categoría que estaba activa
+            if (quiereDesactivar && estadoInicial) {
+                // Verificar si hay servicios activos
+                const serviciosActivosFiltrados = serviciosActivos.filter(s => s.activo);
+
+                if (serviciosActivosFiltrados.length > 0) {
+                    // Prevenir el envío del formulario
+                    event.preventDefault();
+
+                    // Mostrar modal
+                    mostrarModal(serviciosActivosFiltrados);
+                    return false;
+                }
+            }
+
+            // Si no hay problemas, permitir el envío
+            return true;
+        }
+
+        function mostrarModal(servicios) {
+            document.getElementById('count-servicios').textContent = servicios.length;
+
+            const lista = document.getElementById('lista-servicios-activos');
+            lista.innerHTML = '';
+
+            servicios.forEach(servicio => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between p-2 bg-white rounded border border-gray-200';
+                li.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-${servicio.tipo == 'servicio' ? 'handshake' : 'box'} mr-2 text-${servicio.tipo == 'servicio' ? 'blue' : 'green'}-600"></i>
+                        <span class="font-medium">${servicio.nombre}</span>
+                        <span class="ml-2 px-2 py-1 text-xs rounded-full bg-${servicio.tipo == 'servicio' ? 'blue' : 'green'}-100 text-${servicio.tipo == 'servicio' ? 'blue' : 'green'}-700">
+                            ${servicio.tipo.charAt(0).toUpperCase() + servicio.tipo.slice(1)}
+                        </span>
+                    </div>
+                    <a href="/servicios/${servicio.id}/edit" target="_blank" class="text-sm text-indigo-600 hover:text-indigo-800">
+                        <i class="fas fa-external-link-alt mr-1"></i>
+                        Editar
+                    </a>
+                `;
+                lista.appendChild(li);
+            });
+
+            document.getElementById('modal-advertencia').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-advertencia').classList.add('hidden');
+        }
+
+        async function desactivarTodo() {
+            try {
+                // Mostrar loader o desactivar botón
+                const boton = event.target;
+                boton.disabled = true;
+                boton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Desactivando...';
+
+                // Desactivar servicios mediante fetch
+                const response = await fetch(`/categorias/${categoriaId}/desactivar-servicios`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Actualizar el array de servicios activos
+                    serviciosActivos = serviciosActivos.map(s => ({...s, activo: false}));
+
+                    // Cerrar modal
+                    cerrarModal();
+
+                    // Marcar como validado y enviar el formulario principal
+                    formularioValidado = true;
+                    document.getElementById('form-categoria').submit();
+                } else {
+                    alert('Error al desactivar los servicios. Por favor intenta nuevamente.');
+                    boton.disabled = false;
+                    boton.innerHTML = '<i class="fas fa-power-off mr-2"></i>Desactivar Todo y Continuar';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al desactivar los servicios. Por favor intenta nuevamente.');
+            }
+        }
+
         function previewImage(event) {
             const file = event.target.files[0];
             if (file) {

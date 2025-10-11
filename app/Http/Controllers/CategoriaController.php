@@ -79,16 +79,8 @@ class CategoriaController extends Controller
             'activo' => 'boolean'
         ]);
 
-        // Verificar si se está intentando desactivar una categoría con servicios asociados
-        $activo = $request->input('activo', 0);
-        if (!$activo && $categoria->servicios()->count() > 0) {
-            return redirect()->back()
-                            ->withInput()
-                            ->with('error', 'No se puede desactivar la categoría porque tiene ' . $categoria->servicios()->count() . ' servicio(s) asociado(s).');
-        }
-
         $data = $request->all();
-        $data['activo'] = $activo;
+        $data['activo'] = $request->input('activo', 0);
 
         if ($request->hasFile('imagen')) {
             // Eliminar imagen anterior
@@ -126,5 +118,24 @@ class CategoriaController extends Controller
     public function obtenerCategorias()
     {
         return response()->json(Categoria::activo()->orderBy('nombre')->get());
+    }
+
+    public function desactivarServicios(Request $request, Categoria $categoria)
+    {
+        // Desactivar todos los servicios de esta categoría
+        $count = $categoria->servicios()->update(['activo' => false]);
+
+        // Si es una petición AJAX, retornar JSON
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Se han desactivado {$count} servicios/productos.",
+                'count' => $count
+            ]);
+        }
+
+        // Si no es AJAX, redirigir
+        return redirect()->route('categorias.edit', $categoria)
+                        ->with('success', "Se han desactivado {$count} servicios/productos. Ahora puedes desactivar la categoría.");
     }
 }

@@ -93,8 +93,14 @@ class ServicioController extends Controller
 
     public function edit(Servicio $servicio)
     {
+        // Obtener solo categorías activas para el selector
         $categorias = Categoria::activo()->orderBy('nombre')->get();
-        return view('servicios.edit', compact('servicio', 'categorias'));
+
+        // Verificar si la categoría actual está inactiva
+        $categoriaActual = $servicio->categoria;
+        $categoriaInactiva = $categoriaActual && !$categoriaActual->activo;
+
+        return view('servicios.edit', compact('servicio', 'categorias', 'categoriaInactiva', 'categoriaActual'));
     }
 
     public function update(Request $request, Servicio $servicio)

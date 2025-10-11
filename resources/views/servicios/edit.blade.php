@@ -73,9 +73,10 @@
 
                             <div>
                                 <label class="form-label required">Categoría</label>
-                                <select name="categoria_id" class="form-select @error('categoria_id') border-red-500 @enderror" required>
+                                <select id="select-categoria" name="categoria_id" class="form-select @error('categoria_id') border-red-500 @enderror" required>
+                                    <option value="">Seleccione una categoría</option>
                                     @foreach($categorias as $categoria)
-                                        <option value="{{ $categoria->id }}" {{ old('categoria_id', $servicio->categoria_id) == $categoria->id ? 'selected' : '' }}>
+                                        <option value="{{ $categoria->id }}">
                                             {{ $categoria->nombre }}
                                         </option>
                                     @endforeach
@@ -178,7 +179,7 @@
                         <i class="fas fa-times mr-2"></i>
                         Cancelar
                     </a>
-                    <button type="submit" class="btn-primary">
+                    <button type="submit" id="btn-actualizar" class="btn-primary">
                         <i class="fas fa-save mr-2"></i>
                         Actualizar
                     </button>
@@ -188,7 +189,85 @@
         </div>
     </div>
 
+    <!-- Modal de advertencia para categoría inactiva -->
+    <div id="modal-categoria-inactiva" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+                <div class="px-6 py-4 bg-orange-600">
+                    <h3 class="text-lg font-semibold text-white flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3"></i>
+                        Categoría Inactiva
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">
+                        Este {{ $servicio->tipo }} pertenece a la categoría
+                        <strong id="nombre-categoria-inactiva">{{ $categoriaActual ? $categoriaActual->nombre : '' }}</strong>
+                        que actualmente está <span class="text-orange-600 font-semibold">inactiva</span>.
+                    </p>
+                    <p class="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Para poder guardar los cambios, debes seleccionar una categoría activa.
+                    </p>
+                </div>
+                <div class="px-6 py-4 bg-gray-50 flex justify-end">
+                    <button type="button" onclick="cerrarModalCategoriaInactiva()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-check mr-2"></i>
+                        Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
+    <script>
+        const categoriaInactiva = @json($categoriaInactiva ?? false);
+        const categoriasActivas = @json($categorias->pluck('id')->toArray());
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectCategoria = document.getElementById('select-categoria');
+            const btnActualizar = document.getElementById('btn-actualizar');
+
+            // Si la categoría está inactiva, mostrar modal y bloquear botón
+            if (categoriaInactiva) {
+                mostrarModalCategoriaInactiva();
+                bloquearBotonActualizar();
+            }
+
+            // Escuchar cambios en el select de categoría
+            selectCategoria.addEventListener('change', function() {
+                if (this.value && categoriasActivas.includes(parseInt(this.value))) {
+                    desbloquearBotonActualizar();
+                } else if (categoriaInactiva) {
+                    bloquearBotonActualizar();
+                }
+            });
+        });
+
+        function mostrarModalCategoriaInactiva() {
+            document.getElementById('modal-categoria-inactiva').classList.remove('hidden');
+        }
+
+        function cerrarModalCategoriaInactiva() {
+            document.getElementById('modal-categoria-inactiva').classList.add('hidden');
+        }
+
+        function bloquearBotonActualizar() {
+            const btn = document.getElementById('btn-actualizar');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.title = 'Seleccione una categoría activa para actualizar';
+        }
+
+        function desbloquearBotonActualizar() {
+            const btn = document.getElementById('btn-actualizar');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.title = '';
+        }
+    </script>
     <script>
         function previewImage(event) {
             const file = event.target.files[0];

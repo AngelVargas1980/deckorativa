@@ -62,7 +62,28 @@ class CotizacionController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        return view('cotizaciones.create', compact('clientes', 'categorias'));
+        // Preparar servicios para JavaScript
+        $serviciosJS = [];
+        foreach ($categorias as $categoria) {
+            foreach ($categoria->servicios as $servicio) {
+                $serviciosJS[] = [
+                    'id' => $servicio->id,
+                    'nombre' => $servicio->nombre,
+                    'descripcion' => $servicio->descripcion ?? '',
+                    'precio' => $servicio->precio,
+                    'tipo' => $servicio->tipo,
+                    'categoria_id' => $servicio->categoria_id,
+                    'activo' => $servicio->activo,
+                    'imagen' => $servicio->imagen ?? '',
+                    'categoria' => [
+                        'id' => $categoria->id,
+                        'nombre' => $categoria->nombre
+                    ]
+                ];
+            }
+        }
+
+        return view('cotizaciones.create', compact('clientes', 'categorias', 'serviciosJS'));
     }
 
     public function store(Request $request)
@@ -161,9 +182,30 @@ class CotizacionController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        // Preparar servicios para JavaScript
+        $serviciosJS = [];
+        foreach ($categorias as $categoria) {
+            foreach ($categoria->servicios as $servicio) {
+                $serviciosJS[] = [
+                    'id' => $servicio->id,
+                    'nombre' => $servicio->nombre,
+                    'descripcion' => $servicio->descripcion ?? '',
+                    'precio' => $servicio->precio,
+                    'tipo' => $servicio->tipo,
+                    'categoria_id' => $servicio->categoria_id,
+                    'activo' => $servicio->activo,
+                    'imagen' => $servicio->imagen ?? '',
+                    'categoria' => [
+                        'id' => $categoria->id,
+                        'nombre' => $categoria->nombre
+                    ]
+                ];
+            }
+        }
+
         $cotizacion->load(['client', 'detalles.servicio']);
 
-        return view('cotizaciones.edit', compact('cotizacion', 'clientes', 'categorias'));
+        return view('cotizaciones.edit', compact('cotizacion', 'clientes', 'categorias', 'serviciosJS'));
     }
 
     public function update(Request $request, Cotizacion $cotizacion)

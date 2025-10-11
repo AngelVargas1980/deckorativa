@@ -306,24 +306,7 @@
         });
 
         // Cargar servicios con sus categorías
-        let serviciosDisponibles = @json($categorias->flatMap(function($categoria) {
-            return $categoria->servicios->map(function($servicio) use ($categoria) {
-                return [
-                    'id' => $servicio->id,
-                    'nombre' => $servicio->nombre,
-                    'descripcion' => $servicio->descripcion ?? '',
-                    'precio' => $servicio->precio,
-                    'tipo' => $servicio->tipo,
-                    'categoria_id' => $servicio->categoria_id,
-                    'activo' => $servicio->activo,
-                    'imagen' => $servicio->imagen ?? '',
-                    'categoria' => [
-                        'id' => $categoria->id,
-                        'nombre' => $categoria->nombre
-                    ]
-                ];
-            });
-        }));
+        let serviciosDisponibles = @json($serviciosJS);
 
         let serviciosSeleccionados = [];
         let contadorServicios = 0;

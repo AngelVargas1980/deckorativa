@@ -306,25 +306,24 @@
         });
 
         // Cargar servicios con sus categorías
-        let serviciosDisponibles = [];
-        @foreach($categorias as $categoria)
-            @foreach($categoria->servicios as $servicio)
-                serviciosDisponibles.push({
-                    id: {{ $servicio->id }},
-                    nombre: "{{ addslashes($servicio->nombre) }}",
-                    descripcion: "{{ addslashes($servicio->descripcion ?? '') }}",
-                    precio: {{ $servicio->precio }},
-                    tipo: "{{ $servicio->tipo }}",
-                    categoria_id: {{ $servicio->categoria_id }},
-                    activo: {{ $servicio->activo ? 'true' : 'false' }},
-                    imagen: "{{ $servicio->imagen ?? '' }}",
-                    categoria: {
-                        id: {{ $categoria->id }},
-                        nombre: "{{ addslashes($categoria->nombre) }}"
-                    }
-                });
-            @endforeach
-        @endforeach
+        let serviciosDisponibles = @json($categorias->flatMap(function($categoria) {
+            return $categoria->servicios->map(function($servicio) use ($categoria) {
+                return [
+                    'id' => $servicio->id,
+                    'nombre' => $servicio->nombre,
+                    'descripcion' => $servicio->descripcion ?? '',
+                    'precio' => $servicio->precio,
+                    'tipo' => $servicio->tipo,
+                    'categoria_id' => $servicio->categoria_id,
+                    'activo' => $servicio->activo,
+                    'imagen' => $servicio->imagen ?? '',
+                    'categoria' => [
+                        'id' => $categoria->id,
+                        'nombre' => $categoria->nombre
+                    ]
+                ];
+            });
+        }));
 
         let serviciosSeleccionados = [];
         let contadorServicios = 0;

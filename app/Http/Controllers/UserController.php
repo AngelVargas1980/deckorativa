@@ -156,6 +156,11 @@ class UserController extends Controller
 
         $usuario->save();
 
+        // Sincronizar el rol de Spatie Permission
+        if ($request->has('rol')) {
+            $usuario->syncRoles($request->rol);
+        }
+
         return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado correctamente.');
     }
 

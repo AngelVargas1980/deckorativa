@@ -122,18 +122,20 @@
                 </div>
 
                 <div class="space-y-3">
-                    <a href="{{ route('public.servicios') }}" class="w-full bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition text-center block">
+                    <a href="{{ route('public.servicios') }}" class="w-full bg-gray-500 text-white py-2.5 rounded-lg hover:bg-gray-600 transition text-center block text-sm font-medium">
                         ← Seguir Agregando Servicios
                     </a>
-                    <button onclick="generarPDFCotizacion()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold">
-                        📄 Generar PDF de Cotización
-                    </button>
-                    <button onclick="abrirModalPago()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-semibold">
-                        💳 Proceder al Pago
-                    </button>
-                    <button onclick="procederCotizacion()" class="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-semibold">
-                        📧 Solicitar Cotización Gratuita
-                    </button>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <button onclick="generarPDFCotizacion()" class="bg-green-600 text-white py-2.5 rounded-lg hover:bg-green-700 transition font-medium text-sm">
+                            📄 PDF
+                        </button>
+                        <button onclick="abrirModalPago()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2.5 rounded-lg hover:from-blue-700 hover:to-purple-700 transition font-medium text-sm">
+                            💳 Pagar
+                        </button>
+                        <button onclick="procederCotizacion()" class="bg-purple-600 text-white py-2.5 rounded-lg hover:bg-purple-700 transition font-medium text-sm">
+                            📧 Cotizar
+                        </button>
+                    </div>
                 </div>
 
                 <div class="mt-4 text-sm text-gray-500 text-center">

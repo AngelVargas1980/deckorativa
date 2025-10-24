@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
@@ -29,16 +32,39 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        // Verificar que el correo existe en la base de datos
+        $user = User::where('email', $request->email)->first();
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                            ->withErrors(['email' => __($status)]);
+        if (!$user) {
+            return back()->withErrors(['email' => 'No se encontró ningún usuario con este correo electrónico.']);
+        }
+
+        // Generar una contraseña temporal aleatoria
+        $temporaryPassword = Str::random(10);
+
+        // Guardar la contraseña temporal y marcar que es temporal
+        $user->password = Hash::make($temporaryPassword);
+        $user->is_temporary_password = true;
+        $user->save();
+
+        // Enviar el correo con la contraseña temporal
+        try {
+            Mail::raw(
+                "Hola {$user->name},\n\n" .
+                "Has solicitado restablecer tu contraseña.\n\n" .
+                "Tu contraseña temporal es: {$temporaryPassword}\n\n" .
+                "Por favor, inicia sesión con esta contraseña. Se te pedirá que cambies tu contraseña inmediatamente.\n\n" .
+                "Si no solicitaste este cambio, por favor contacta al administrador del sistema.\n\n" .
+                "Saludos,\nEquipo de Deckorativa",
+                function ($message) use ($user) {
+                    $message->to($user->email)
+                            ->subject('Contraseña Temporal - Deckorativa');
+                }
+            );
+
+            return back()->with('status', 'Se ha enviado una contraseña temporal a tu correo electrónico.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['email' => 'Error al enviar el correo. Por favor, intenta de nuevo.']);
+        }
     }
 }

@@ -123,9 +123,12 @@
                     <form method="GET" class="flex items-center space-x-2">
                         <label class="text-sm text-gray-600 font-medium">Mostrar:</label>
                         <select name="per_page" onchange="this.form.submit()" class="form-select py-2 text-sm">
-                            <option value="12" {{ request('per_page') == 12 ? 'selected' : '' }}>12</option>
-                            <option value="24" {{ request('per_page') == 24 ? 'selected' : '' }}>24</option>
-                            <option value="48" {{ request('per_page') == 48 ? 'selected' : '' }}>48</option>
+                            <option value="5" {{ request('per_page', 5) == 5 ? 'selected' : '' }}>5</option>
+                            <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
+                            <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                         </select>
                     </form>
                 </div>
@@ -180,7 +183,7 @@
             <!-- Vista de Tarjetas (Grid) -->
             @if($servicios->count() > 0)
                 <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
                         @foreach($servicios as $servicio)
                             <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
                                 <!-- Imagen del servicio/producto -->

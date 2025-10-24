@@ -204,6 +204,50 @@
     </div>
 </section>
 
+<!-- Sección Nosotros -->
+<section id="nosotros" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold gradient-text mb-6">Sobre Nosotros</h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Somos expertos en transformar espacios con creatividad y profesionalismo
+            </p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h3 class="text-3xl font-bold mb-6">¿Quiénes Somos?</h3>
+                <p class="text-gray-600 mb-4">
+                    Deckorativa es tu aliado en decoración profesional. Nos especializamos en ofrecer soluciones completas de decoración con cotizaciones precisas y transparentes.
+                </p>
+                <p class="text-gray-600 mb-4">
+                    Con años de experiencia en el mercado, hemos ayudado a cientos de clientes a transformar sus espacios en ambientes únicos que reflejan su personalidad y estilo.
+                </p>
+                <p class="text-gray-600">
+                    Nuestro compromiso es ofrecerte la mejor calidad al mejor precio, con un servicio personalizado que supere tus expectativas.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-purple-100 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-purple-600 mb-2">500+</div>
+                    <div class="text-gray-600">Proyectos Completados</div>
+                </div>
+                <div class="bg-indigo-100 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">98%</div>
+                    <div class="text-gray-600">Clientes Satisfechos</div>
+                </div>
+                <div class="bg-pink-100 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-pink-600 mb-2">50+</div>
+                    <div class="text-gray-600">Servicios Disponibles</div>
+                </div>
+                <div class="bg-yellow-100 p-6 rounded-xl text-center">
+                    <div class="text-4xl font-bold text-yellow-600 mb-2">24/7</div>
+                    <div class="text-gray-600">Atención al Cliente</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Sección de Cotización -->
 <section id="cotizador" class="py-20 bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
     <div class="max-w-4xl mx-auto px-6 text-center">
@@ -270,7 +314,7 @@
                 </ul>
             </div>
 
-            <div>
+            <div id="contacto">
                 <h4 class="text-lg font-semibold mb-4">Contacto</h4>
                 <ul class="space-y-2 text-gray-400">
                     <li>📧 info@deckorativa.com</li>

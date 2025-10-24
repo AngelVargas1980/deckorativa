@@ -37,7 +37,7 @@ class ServicioController extends Controller
             $query->where('activo', $request->activo);
         }
 
-        $perPage = $request->get('per_page', 12);
+        $perPage = $request->get('per_page', 5);
         $servicios = $query->orderBy('created_at', 'desc')
                           ->paginate($perPage)
                           ->appends($request->except('page'));

@@ -30,6 +30,7 @@ class User extends Authenticatable
         'password',
         'rol',
         'estado',
+        'is_temporary_password',
     ];
 
     /**

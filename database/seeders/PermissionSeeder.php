@@ -29,6 +29,7 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'edit users']);
         Permission::firstOrCreate(['name' => 'delete users']);
         Permission::firstOrCreate(['name' => 'view users']);
+        Permission::firstOrCreate(['name' => 'restore users']);
 
         // Clientes
         Permission::firstOrCreate(['name' => 'create clients']);

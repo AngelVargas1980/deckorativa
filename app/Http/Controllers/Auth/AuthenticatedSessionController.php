@@ -29,6 +29,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Verificar si el usuario tiene una contraseña temporal
+        $user = Auth::user();
+        if ($user && $user->is_temporary_password) {
+            return redirect()->route('password.change.required');
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

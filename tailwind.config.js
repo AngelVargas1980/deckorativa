@@ -14,7 +14,10 @@ export default {
 
 
     ],
-
+    safelist: [
+        'flex', 'flex-col', 'lg:flex-row', 'lg:justify-between', 'lg:items-center',
+        'mb-4', 'lg:mb-0', 'flex-1', 'lg:max-w-xs'
+    ],
     theme: {
         extend: {
             fontFamily: {

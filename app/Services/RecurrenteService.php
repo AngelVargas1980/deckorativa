@@ -74,7 +74,8 @@ class RecurrenteService
             return [
                 'success' => false,
                 'error' => 'Error al procesar el pago. Intente nuevamente.',
-                'details' => $response->json()
+                'details' => $response->json(),
+                
             ];
 
         } catch (\Exception $e) {

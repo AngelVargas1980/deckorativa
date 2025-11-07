@@ -34,7 +34,8 @@ class ServicioController extends Controller
 
         // Filtro de estado
         if ($request->has('activo') && $request->activo !== '') {
-            $query->where('activo', $request->activo);
+            $activo = (int) $request->activo;
+            $query->where('activo', $activo);
         }
 
         $perPage = $request->get('per_page', 5);
@@ -105,6 +106,7 @@ class ServicioController extends Controller
 
     public function update(Request $request, Servicio $servicio)
     {
+        // dd($request);
         $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',

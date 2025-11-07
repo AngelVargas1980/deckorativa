@@ -58,5 +58,12 @@ class PermissionSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'generate pdf cotizaciones']);
         Permission::firstOrCreate(['name' => 'send email cotizaciones']);
         Permission::firstOrCreate(['name' => 'change state cotizaciones']);
+
+        // Pedidos
+        Permission::firstOrCreate(['name' => 'create pedidos']);
+        Permission::firstOrCreate(['name' => 'view pedidos']);
+        Permission::firstOrCreate(['name' => 'edit pedidos']);
+        Permission::firstOrCreate(['name' => 'delete pedidos']);
+
     }
 }

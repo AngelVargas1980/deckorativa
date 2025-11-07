@@ -76,7 +76,7 @@
                                 <select id="select-categoria" name="categoria_id" class="form-select @error('categoria_id') border-red-500 @enderror" required>
                                     <option value="">Seleccione una categoría</option>
                                     @foreach($categorias as $categoria)
-                                        <option value="{{ $categoria->id }}">
+                                        <option value="{{ $categoria->id }}" {{ old('categoria_id', $servicio->categoria_id) == $categoria->id ? 'selected' : '' }}>
                                             {{ $categoria->nombre }}
                                         </option>
                                     @endforeach
@@ -126,6 +126,8 @@
                         </div>
 
                         <div>
+                            <!-- Input hidden que siempre envía 0 -->
+                            <input type="hidden" name="activo" value="0">
                             <label class="form-label flex items-center">
                                 <input type="checkbox" name="activo" value="1" {{ old('activo', $servicio->activo) ? 'checked' : '' }} 
                                        class="mr-2 rounded">

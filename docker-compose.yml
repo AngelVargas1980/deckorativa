@@ -1,0 +1,63 @@
+services:
+    web:
+        build:
+            target: web
+            context: .
+        env_file:
+            - .env
+        environment:
+            - DB_HOST=db
+            - DB_PORT=3306
+        ports:
+            - "127.0.0.1:3000:80"
+        command: >
+            sh -c "
+            if [ ! -f .env ]; then cp .env.example .env; fi;
+            php artisan key:generate --force;
+            php artisan config:clear;
+            php artisan cache:clear;
+            php artisan config:cache;
+            php artisan route:cache;
+            php artisan view:cache;
+            php artisan migrate --force;
+            php artisan migrate:fresh --seed;
+            php artisan storage:link;
+            apache2-foreground;
+            npm run dev;
+            "
+        volumes:
+            - ./storage:/var/www/html/storage
+        depends_on:
+            db:
+                condition: service_healthy
+
+    db:
+        image: mysql:8.0.30
+        env_file:
+            - .env
+        environment:
+            MYSQL_ROOT_PASSWORD: change-me
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: change-me
+            MYSQL_INITDB_SKIP_TZINFO: "1"
+            MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: '1'
+        command:
+            --collation-server=utf8mb4_unicode_ci
+            --character-set-server=utf8mb4
+            --log_bin_trust_function_creators=1
+            --default-authentication-plugin=mysql_native_password
+        ports:
+            - "127.0.0.1:3306:3306"
+        volumes:
+            - dbdeckorativa:/var/lib/mysql
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pchange-me"]
+            timeout: 20s
+            retries: 10
+            interval: 30s
+            start_period: 30s
+
+volumes:
+    dbdeckorativa:

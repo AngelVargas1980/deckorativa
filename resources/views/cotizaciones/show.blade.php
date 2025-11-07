@@ -249,7 +249,7 @@
                     <!-- Acciones Rápidas -->
                     <div class="mt-6 pt-4 border-t space-y-2">
                         @can('send email cotizaciones')
-                        @if(!$cotizacion->enviada_cliente)
+                        {{-- @if(!$cotizacion->enviada_cliente) --}}
                         <form action="{{ route('cotizaciones.enviar', $cotizacion) }}" method="POST">
                             @csrf
                             <button type="submit" class="w-full btn-primary btn-sm">
@@ -257,7 +257,7 @@
                                 Enviar por Email
                             </button>
                         </form>
-                        @endif
+                        {{-- @endif --}}
                         @endcan
 
                         @can('generate pdf cotizaciones')
